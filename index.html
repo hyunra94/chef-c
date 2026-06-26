@@ -1143,4 +1143,39 @@ function updateApiStatus() {
   }
 }
 
+function saveWorkerUrl() {
+  const url = document.getElementById('worker-url-input').value.trim().replace(/\/+$/, '');
+  if (!url) { toast('Worker URL을 입력해주세요'); return; }
+  if (!url.startsWith('https://')) { toast('https:// 로 시작해야 합니다'); return; }
+  S.workerUrl = url;
+  localStorage.setItem('fridge_worker_url', url);
+  updateApiStatus();
+  toast('☁️ Worker URL 저장됨');
+}
+
+async function testWorker() {
+  const url = (document.getElementById('worker-url-input').value.trim() || S.workerUrl).replace(/\/+$/, '');
+  if (!url) { toast('Worker URL을 먼저 입력해주세요'); return; }
+  const el = document.getElementById('worker-status');
+  el.style.display = 'block';
+  el.style.color = 'var(--muted)';
+  el.textContent = '⏳ 연결 확인 중...';
+  try {
+    const res  = await fetch(url + '/api/health', { signal: AbortSignal.timeout(8000) });
+    const data = await res.json();
+    if (data.ok) {
+      const sv = data.services || {};
+      el.style.color = 'var(--accent-teal)';
+      el.innerHTML = '✅ 연결 성공!&nbsp;&nbsp;'
+        + (sv.claude ? '🟣 Claude ✓' : '🟣 Claude ✗') + '&nbsp;'
+        + (sv.gemini ? '🔵 Gemini ✓' : '🔵 Gemini ✗') + '&nbsp;'
+        + (sv.openai ? '🟢 GPT ✓'   : '🟢 GPT ✗')    + '&nbsp;'
+        + (sv.notion ? '📝 Notion ✓' : '📝 Notion ✗');
+    } else throw new Error('응답 이상');
+  } catch(e) {
+    el.style.color = 'var(--danger)';
+    el.textContent = '❌ 연결 실패: ' + e.message;
+  }
+}
+
 function sav
