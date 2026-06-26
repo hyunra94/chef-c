@@ -14,9 +14,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
-    /* ==============================
-       DESIGN TOKENS
-    ============================== */
     :root {
       --bg: #E0E5EC;
       --fg: #3D4852;
@@ -25,13 +22,10 @@
       --accent-light: #8B84FF;
       --accent-teal: #38B2AC;
       --danger: #E05C5C;
-      --shadow-light: rgba(255, 255, 255, 0.55);
-      --shadow-dark: rgba(163, 177, 198, 0.65);
       --r-card: 32px;
       --r-btn: 16px;
       --r-inner: 12px;
       --transition: 300ms ease-out;
-      /* Shadows */
       --shadow-extruded: 9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5);
       --shadow-extruded-hover: 12px 12px 20px rgba(163,177,198,0.7), -12px -12px 20px rgba(255,255,255,0.6);
       --shadow-extruded-sm: 5px 5px 10px rgba(163,177,198,0.6), -5px -5px 10px rgba(255,255,255,0.5);
@@ -39,10 +33,6 @@
       --shadow-inset-deep: inset 10px 10px 20px rgba(163,177,198,0.7), inset -10px -10px 20px rgba(255,255,255,0.6);
       --shadow-inset-sm: inset 3px 3px 6px rgba(163,177,198,0.6), inset -3px -3px 6px rgba(255,255,255,0.5);
     }
-
-    /* ==============================
-       RESET & BASE
-    ============================== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
@@ -56,26 +46,8 @@
     }
     button { font-family: inherit; cursor: pointer; border: none; background: none; }
     input, textarea, select { font-family: inherit; }
-    a { text-decoration: none; color: inherit; }
 
-    /* ==============================
-       UTILITY CLASSES
-    ============================== */
-    .neu-card {
-      background: var(--bg);
-      border-radius: var(--r-card);
-      box-shadow: var(--shadow-extruded);
-    }
-    .neu-inset {
-      background: var(--bg);
-      border-radius: var(--r-inner);
-      box-shadow: var(--shadow-inset);
-    }
-    .neu-inset-deep {
-      background: var(--bg);
-      border-radius: var(--r-inner);
-      box-shadow: var(--shadow-inset-deep);
-    }
+    /* ── 유틸 ── */
     .neu-btn {
       background: var(--bg);
       border-radius: var(--r-btn);
@@ -91,960 +63,206 @@
       padding: 10px 20px;
       font-size: 14px;
     }
-    .neu-btn:hover {
-      box-shadow: var(--shadow-extruded-hover);
-      transform: translateY(-1px);
-    }
-    .neu-btn:active {
-      box-shadow: var(--shadow-inset-sm);
-      transform: translateY(0.5px);
-    }
+    .neu-btn:hover { box-shadow: var(--shadow-extruded-hover); transform: translateY(-1px); }
+    .neu-btn:active { box-shadow: var(--shadow-inset-sm); transform: translateY(0.5px); }
     .neu-btn-accent {
-      background: var(--accent);
-      color: #fff;
+      background: var(--accent); color: #fff;
       box-shadow: 5px 5px 10px rgba(108,99,255,0.4), -5px -5px 10px rgba(255,255,255,0.3);
     }
-    .neu-btn-accent:hover {
-      background: var(--accent-light);
-      box-shadow: 8px 8px 16px rgba(108,99,255,0.45), -8px -8px 16px rgba(255,255,255,0.35);
-      transform: translateY(-1px);
-    }
-    .neu-btn-accent:active {
-      box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2), inset -4px -4px 8px rgba(255,255,255,0.1);
-      transform: translateY(0.5px);
-    }
-    .neu-btn-danger {
-      color: var(--danger);
-    }
+    .neu-btn-accent:hover { background: var(--accent-light); box-shadow: 8px 8px 16px rgba(108,99,255,0.45), -8px -8px 16px rgba(255,255,255,0.35); transform: translateY(-1px); }
+    .neu-btn-accent:active { box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2), inset -4px -4px 8px rgba(255,255,255,0.1); transform: translateY(0.5px); }
     .neu-input {
-      width: 100%;
-      background: var(--bg);
-      border: none;
-      outline: none;
-      border-radius: var(--r-btn);
-      box-shadow: var(--shadow-inset);
-      padding: 12px 16px;
-      color: var(--fg);
-      font-size: 14px;
+      width: 100%; background: var(--bg); border: none; outline: none;
+      border-radius: var(--r-btn); box-shadow: var(--shadow-inset);
+      padding: 12px 16px; color: var(--fg); font-size: 14px;
       transition: box-shadow var(--transition);
     }
-    .neu-input:focus {
-      box-shadow: var(--shadow-inset-deep);
-    }
+    .neu-input:focus { box-shadow: var(--shadow-inset-deep); }
     .neu-input::placeholder { color: #A0AEC0; }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 2px 10px;
-      min-height: 22px;
-    }
-    .badge-sauce { background: rgba(255,165,0,0.15); color: #C07A00; }
-    .badge-main { background: rgba(108,99,255,0.12); color: var(--accent); }
-    .badge-sub { background: rgba(56,178,172,0.12); color: var(--accent-teal); }
     .text-muted { color: var(--muted); }
     .text-accent { color: var(--accent); }
     .text-teal { color: var(--accent-teal); }
     .text-danger { color: var(--danger); }
     .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .icon { font-style: normal; line-height: 1; }
+    .badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; font-size: 11px; font-weight: 700; padding: 2px 10px; min-height: 22px; }
+    .badge-sauce { background: rgba(255,165,0,0.15); color: #C07A00; }
+    .badge-main  { background: rgba(108,99,255,0.12); color: var(--accent); }
+    .badge-sub   { background: rgba(56,178,172,0.12); color: var(--accent-teal); }
 
-    /* ==============================
-       LAYOUT
-    ============================== */
-    .app-container {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 0 16px 100px;
-      min-height: 100vh;
-    }
+    /* ── 레이아웃 ── */
+    .app-container { max-width: 480px; margin: 0 auto; padding: 0 16px 100px; }
 
-    /* ==============================
-       HEADER
-    ============================== */
-    .app-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg);
-      padding: 16px 0 12px;
-    }
-    .header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .app-logo {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 800;
-      font-size: 20px;
-      color: var(--fg);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .app-logo .logo-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 14px;
-      background: var(--bg);
-      box-shadow: var(--shadow-extruded-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-    }
-    .header-subtitle {
-      font-size: 11px;
-      color: var(--muted);
-      font-weight: 400;
-      letter-spacing: 0.03em;
-    }
+    /* ── 헤더 ── */
+    .app-header { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 16px 0 12px; }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; }
+    .app-logo { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 20px; color: var(--fg); display: flex; align-items: center; gap: 8px; }
+    .logo-icon { width: 40px; height: 40px; border-radius: 14px; background: var(--bg); box-shadow: var(--shadow-extruded-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; animation: float 3s ease-in-out infinite; }
+    .header-subtitle { font-size: 11px; color: var(--muted); font-weight: 400; }
 
-    /* ==============================
-       BOTTOM NAV
-    ============================== */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      background: var(--bg);
-      padding: 10px 20px 20px;
-      z-index: 100;
-      box-shadow: 0 -4px 20px rgba(163,177,198,0.35);
-    }
-    .nav-items {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-    }
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      padding: 8px 16px;
-      border-radius: var(--r-inner);
-      transition: all var(--transition);
-      cursor: pointer;
-      min-width: 60px;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 500;
-    }
-    .nav-item .nav-icon {
-      font-size: 20px;
-      transition: transform var(--transition);
-    }
-    .nav-item.active {
-      color: var(--accent);
-      box-shadow: var(--shadow-inset);
-    }
-    .nav-item:not(.active):hover {
-      color: var(--fg);
-      transform: translateY(-1px);
-    }
+    /* ── 바텀 네비 ── */
+    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--bg); padding: 10px 20px 20px; z-index: 100; box-shadow: 0 -4px 20px rgba(163,177,198,0.35); }
+    .nav-items { display: flex; justify-content: space-around; align-items: center; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 16px; border-radius: var(--r-inner); transition: all var(--transition); cursor: pointer; min-width: 60px; color: var(--muted); font-size: 11px; font-weight: 500; background: none; border: none; }
+    .nav-item .nav-icon { font-size: 20px; }
+    .nav-item.active { color: var(--accent); box-shadow: var(--shadow-inset); }
+    .nav-item:not(.active):hover { color: var(--fg); transform: translateY(-1px); }
 
-    /* ==============================
-       SECTIONS (Pages)
-    ============================== */
+    /* ── 페이지 ── */
     .page { display: none; }
     .page.active { display: block; }
 
-    /* ==============================
-       PAGE: FRIDGE (재료 목록)
-    ============================== */
-    .section-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 18px;
-      color: var(--fg);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .fridge-summary {
-      background: var(--bg);
-      border-radius: var(--r-card);
-      box-shadow: var(--shadow-extruded);
-      padding: 20px 24px;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-around;
-    }
-    .summary-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-    .summary-num {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--fg);
-    }
+    /* ── 섹션 타이틀 ── */
+    .section-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; color: var(--fg); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    /* ── 냉장고 요약 ── */
+    .fridge-summary { background: var(--bg); border-radius: var(--r-card); box-shadow: var(--shadow-extruded); padding: 20px 24px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+    .summary-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .summary-num { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 26px; font-weight: 800; color: var(--fg); }
     .summary-num.warn { color: var(--danger); }
-    .summary-label {
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .summary-divider {
-      width: 1px;
-      background: rgba(163,177,198,0.4);
-      height: 40px;
-      align-self: center;
-    }
+    .summary-label { font-size: 10px; color: var(--muted); }
+    .summary-divider { width: 1px; background: rgba(163,177,198,0.4); height: 40px; align-self: center; }
 
-    /* 카테고리 탭 */
-    .cat-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: none;
-    }
+    /* ── 카테고리 탭 ── */
+    .cat-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
     .cat-tabs::-webkit-scrollbar { display: none; }
-    .cat-tab {
-      flex-shrink: 0;
-      padding: 8px 18px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 500;
-      background: var(--bg);
-      box-shadow: var(--shadow-extruded-sm);
-      color: var(--muted);
-      transition: all var(--transition);
-      cursor: pointer;
-    }
-    .cat-tab.active {
-      box-shadow: var(--shadow-inset);
-      color: var(--accent);
-      font-weight: 700;
-    }
-    .cat-tab:not(.active):hover {
-      transform: translateY(-1px);
-      color: var(--fg);
-    }
+    .cat-tab { flex-shrink: 0; padding: 8px 18px; border-radius: 999px; font-size: 13px; font-weight: 500; background: var(--bg); box-shadow: var(--shadow-extruded-sm); color: var(--muted); transition: all var(--transition); cursor: pointer; border: none; }
+    .cat-tab.active { box-shadow: var(--shadow-inset); color: var(--accent); font-weight: 700; }
+    .cat-tab:not(.active):hover { transform: translateY(-1px); color: var(--fg); }
 
-    /* 재료 리스트 */
-    .ingredient-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .ingredient-card {
-      background: var(--bg);
-      border-radius: 20px;
-      box-shadow: var(--shadow-extruded-sm);
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: all var(--transition);
-      position: relative;
-    }
-    .ingredient-card:hover {
-      box-shadow: var(--shadow-extruded);
-      transform: translateY(-1px);
-    }
-    .ingredient-card.expiring-soon {
-      border-left: 3px solid var(--danger);
-    }
-    .ingredient-card.checked-for-recipe {
-      box-shadow: var(--shadow-inset-sm);
-      transform: translateY(0);
-    }
-    .ingredient-card.checked-for-recipe .ingredient-name {
-      color: var(--accent);
-    }
-    .ingredient-emoji {
-      width: 44px;
-      height: 44px;
-      border-radius: var(--r-inner);
-      box-shadow: var(--shadow-inset);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-    .ingredient-info { flex: 1; min-width: 0; }
-    .ingredient-name {
-      font-weight: 600;
-      font-size: 15px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .ingredient-meta {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 3px;
-      flex-wrap: wrap;
-    }
-    .ingredient-date {
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .exp-badge {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 999px;
-    }
-    .exp-ok { background: rgba(56,178,172,0.12); color: var(--accent-teal); }
-    .exp-warn { background: rgba(255,165,0,0.15); color: #C07A00; }
-    .exp-danger { background: rgba(224,92,92,0.12); color: var(--danger); }
+    /* ── 재료 카드 ── */
+    .ingredient-list { display: flex; flex-direction: column; gap: 10px; }
+    .ingredient-card { background: var(--bg); border-radius: 20px; box-shadow: var(--shadow-extruded-sm); padding: 14px 16px; display: flex; align-items: center; gap: 12px; transition: all var(--transition); }
+    .ingredient-card:hover { box-shadow: var(--shadow-extruded); transform: translateY(-1px); }
+    .ingredient-card.expiring-soon { border-left: 3px solid var(--danger); }
+    .ingredient-card.checked-for-recipe { box-shadow: var(--shadow-inset-sm); transform: translateY(0); }
+    .ingredient-card.checked-for-recipe .ingredient-name { color: var(--accent); }
+    .ingredient-card.consumed { opacity: 0.45; box-shadow: var(--shadow-inset-sm); }
+    .ingredient-card.consumed .ingredient-name { text-decoration: line-through; color: var(--muted); }
+    .ingredient-emoji { width: 44px; height: 44px; border-radius: var(--r-inner); box-shadow: var(--shadow-inset); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .ingredient-info { flex: 1; min-width: 0; cursor: pointer; }
+    .ingredient-name { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ingredient-meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
+    .ingredient-date { font-size: 11px; color: var(--muted); }
+    .exp-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+    .exp-ok    { background: rgba(56,178,172,0.12); color: var(--accent-teal); }
+    .exp-warn  { background: rgba(255,165,0,0.15);  color: #C07A00; }
+    .exp-danger{ background: rgba(224,92,92,0.12);  color: var(--danger); }
+
+    /* 레시피 선택 체크 */
+    .recipe-check { width: 22px; height: 22px; border-radius: 8px; box-shadow: var(--shadow-extruded-sm); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; font-size: 13px; transition: all var(--transition); border: none; background: var(--bg); color: transparent; }
+    .recipe-check.checked { box-shadow: var(--shadow-inset-sm); color: var(--accent); }
+
     /* 소진 버튼 */
-    .consumed-btn {
-      flex-shrink: 0;
-      padding: 6px 12px;
-      border-radius: 10px;
-      background: var(--bg);
-      box-shadow: var(--shadow-extruded-sm);
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-      cursor: pointer;
-      border: none;
-      transition: all var(--transition);
-      white-space: nowrap;
-    }
-    .consumed-btn:hover {
-      color: var(--danger);
-      box-shadow: var(--shadow-extruded);
-      transform: translateY(-1px);
-    }
-    .consumed-btn:active {
-      box-shadow: var(--shadow-inset-sm);
-      transform: translateY(0.5px);
-    }
-    /* 소진된 재료 카드 */
-    .ingredient-card.consumed {
-      opacity: 0.45;
-      box-shadow: var(--shadow-inset-sm);
-    }
-    .ingredient-card.consumed .ingredient-name {
-      text-decoration: line-through;
-      color: var(--muted);
-    }
-    .ingredient-card.consumed .consumed-btn {
-      color: var(--accent-teal);
-      box-shadow: var(--shadow-inset-sm);
-    }
-    .del-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 9px;
-      background: var(--bg);
-      box-shadow: var(--shadow-inset-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      color: var(--muted);
-      transition: all var(--transition);
-      cursor: pointer;
-      border: none;
-    }
-    .del-btn:hover {
-      color: var(--danger);
-      box-shadow: var(--shadow-inset);
-    }
+    .consumed-btn { flex-shrink: 0; padding: 6px 12px; border-radius: 10px; background: var(--bg); box-shadow: var(--shadow-extruded-sm); font-size: 11px; font-weight: 700; color: var(--muted); cursor: pointer; border: none; transition: all var(--transition); white-space: nowrap; }
+    .consumed-btn:hover { color: var(--danger); box-shadow: var(--shadow-extruded); transform: translateY(-1px); }
+    .consumed-btn:active { box-shadow: var(--shadow-inset-sm); transform: translateY(0.5px); }
+    .ingredient-card.consumed .consumed-btn { color: var(--accent-teal); box-shadow: var(--shadow-inset-sm); }
 
     /* 빈 상태 */
-    .empty-state {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--muted);
-    }
+    .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
     .empty-icon { font-size: 56px; margin-bottom: 12px; }
-    .empty-text { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
-    .empty-sub { font-size: 13px; }
+    .empty-text { font-size: 15px; font-weight: 500; margin-bottom: 4px; color: var(--fg); }
+    .empty-sub  { font-size: 13px; }
 
     /* FAB */
-    .fab {
-      position: fixed;
-      bottom: 82px;
-      right: calc(50% - 230px);
-      width: 56px;
-      height: 56px;
-      border-radius: 999px;
-      background: var(--accent);
-      color: #fff;
-      font-size: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 6px 6px 14px rgba(108,99,255,0.4), -6px -6px 14px rgba(255,255,255,0.3);
-      cursor: pointer;
-      transition: all var(--transition);
-      border: none;
-      line-height: 1;
-    }
-    .fab:hover {
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 9px 9px 20px rgba(108,99,255,0.45), -9px -9px 20px rgba(255,255,255,0.35);
-    }
-    .fab:active {
-      transform: scale(0.95);
-    }
-    @media (max-width: 480px) {
-      .fab { right: 20px; }
-    }
+    .fab { position: fixed; bottom: 82px; right: calc(50% - 230px); width: 56px; height: 56px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 26px; display: flex; align-items: center; justify-content: center; box-shadow: 6px 6px 14px rgba(108,99,255,0.4), -6px -6px 14px rgba(255,255,255,0.3); cursor: pointer; transition: all var(--transition); border: none; line-height: 1; }
+    .fab:hover { transform: translateY(-2px) scale(1.05); }
+    .fab:active { transform: scale(0.95); }
+    @media (max-width: 480px) { .fab { right: 20px; } }
 
-    /* ==============================
-       MODAL / BOTTOM SHEET
-    ============================== */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(163,177,198,0.35);
-      backdrop-filter: blur(6px);
-      z-index: 200;
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-    }
-    .modal-overlay.open {
-      display: flex;
-      animation: fadeIn 0.2s ease;
-    }
-    .bottom-sheet {
-      background: var(--bg);
-      border-radius: 28px 28px 0 0;
-      box-shadow: 0 -8px 30px rgba(163,177,198,0.5);
-      padding: 24px 24px 40px;
-      width: 100%;
-      max-width: 480px;
-      animation: slideUp 0.3s ease-out;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    .sheet-handle {
-      width: 40px;
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(163,177,198,0.5);
-      margin: 0 auto 20px;
-    }
-    .sheet-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 18px;
-      margin-bottom: 20px;
-    }
-    .form-group {
-      margin-bottom: 16px;
-    }
-    .form-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 8px;
-      display: block;
-    }
-    .cat-select-row {
-      display: flex;
-      gap: 8px;
-    }
-    .cat-select-btn {
-      flex: 1;
-      padding: 10px 8px;
-      border-radius: var(--r-inner);
-      font-size: 13px;
-      font-weight: 500;
-      background: var(--bg);
-      box-shadow: var(--shadow-extruded-sm);
-      color: var(--muted);
-      transition: all var(--transition);
-      cursor: pointer;
-      text-align: center;
-    }
-    .cat-select-btn.active {
-      box-shadow: var(--shadow-inset);
-      color: var(--accent);
-      font-weight: 700;
-    }
-    .date-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .toggle-btn {
-      flex-shrink: 0;
-      padding: 10px 14px;
-      border-radius: var(--r-inner);
-      font-size: 12px;
-      font-weight: 600;
-      background: var(--bg);
-      box-shadow: var(--shadow-extruded-sm);
-      color: var(--muted);
-      transition: all var(--transition);
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .toggle-btn.on {
-      box-shadow: var(--shadow-inset-sm);
-      color: var(--accent);
-    }
-    .sheet-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 24px;
-    }
-    .sheet-actions .neu-btn { flex: 1; padding: 14px; font-size: 15px; border-radius: var(--r-btn); }
-
-    /* Emoji picker row */
-    .emoji-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
-    .emoji-opt {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      box-shadow: var(--shadow-extruded-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      cursor: pointer;
-      transition: all var(--transition);
-    }
+    /* ── 모달 / 바텀시트 ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(163,177,198,0.35); backdrop-filter: blur(6px); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+    .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    .bottom-sheet { background: var(--bg); border-radius: 28px 28px 0 0; box-shadow: 0 -8px 30px rgba(163,177,198,0.5); padding: 24px 24px 44px; width: 100%; max-width: 480px; animation: slideUp 0.3s ease-out; max-height: 90vh; overflow-y: auto; }
+    .sheet-handle { width: 40px; height: 4px; border-radius: 999px; background: rgba(163,177,198,0.5); margin: 0 auto 20px; }
+    .sheet-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; display: block; }
+    .cat-select-row { display: flex; gap: 8px; }
+    .cat-select-btn { flex: 1; padding: 10px 8px; border-radius: var(--r-inner); font-size: 13px; font-weight: 500; background: var(--bg); box-shadow: var(--shadow-extruded-sm); color: var(--muted); transition: all var(--transition); cursor: pointer; text-align: center; border: none; }
+    .cat-select-btn.active { box-shadow: var(--shadow-inset); color: var(--accent); font-weight: 700; }
+    .date-row { display: flex; align-items: center; gap: 10px; }
+    .toggle-btn { flex-shrink: 0; padding: 10px 14px; border-radius: var(--r-inner); font-size: 12px; font-weight: 600; background: var(--bg); box-shadow: var(--shadow-extruded-sm); color: var(--muted); transition: all var(--transition); cursor: pointer; white-space: nowrap; border: none; }
+    .toggle-btn.on { box-shadow: var(--shadow-inset-sm); color: var(--accent); }
+    .sheet-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .sheet-actions .neu-btn { flex: 1; padding: 14px; font-size: 15px; }
+    .emoji-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .emoji-opt { width: 40px; height: 40px; border-radius: 12px; box-shadow: var(--shadow-extruded-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: all var(--transition); }
     .emoji-opt:hover { transform: scale(1.1); }
-    .emoji-opt.selected {
-      box-shadow: var(--shadow-inset);
-      transform: scale(1.05);
-    }
+    .emoji-opt.selected { box-shadow: var(--shadow-inset); transform: scale(1.05); }
 
-    /* ==============================
-       PAGE: RECIPE (레시피 추천)
-    ============================== */
-    .recipe-prompt-card {
-      background: var(--bg);
-      border-radius: var(--r-card);
-      box-shadow: var(--shadow-extruded);
-      padding: 24px;
-      margin-bottom: 20px;
-    }
-    .recipe-prompt-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 17px;
-      margin-bottom: 6px;
-    }
-    .recipe-prompt-sub {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 16px;
-    }
-    .selected-ingredients {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
-      min-height: 36px;
-    }
-    .sel-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: var(--bg);
-      box-shadow: var(--shadow-inset-sm);
-      border-radius: 999px;
-      padding: 5px 12px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--accent);
-    }
-    .sel-chip .chip-remove {
-      font-size: 14px;
-      color: var(--muted);
-      cursor: pointer;
-      margin-left: 2px;
-    }
-    .recipe-options-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .recipe-option-btn {
-      flex: 1;
-      padding: 10px 8px;
-      border-radius: var(--r-inner);
-      font-size: 12px;
-      font-weight: 600;
-      background: var(--bg);
-      box-shadow: var(--shadow-extruded-sm);
-      color: var(--muted);
-      transition: all var(--transition);
-      cursor: pointer;
-      text-align: center;
-    }
-    .recipe-option-btn.on {
-      box-shadow: var(--shadow-inset);
-      color: var(--accent);
-    }
-
-    /* 레시피 카드 */
-    .recipe-card {
-      background: var(--bg);
-      border-radius: var(--r-card);
-      box-shadow: var(--shadow-extruded);
-      padding: 22px;
-      margin-bottom: 16px;
-      transition: all var(--transition);
-    }
-    .recipe-card:hover {
-      box-shadow: var(--shadow-extruded-hover);
-      transform: translateY(-2px);
-    }
-    .recipe-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    .recipe-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 18px;
-      line-height: 1.3;
-      flex: 1;
-    }
-    .recipe-title-icon {
-      font-size: 28px;
-      margin-left: 10px;
-    }
-    .recipe-meta-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-    .recipe-meta-tag {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 999px;
-      box-shadow: var(--shadow-inset-sm);
-      color: var(--muted);
-    }
-    .recipe-steps-preview {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.7;
-      margin-bottom: 14px;
-    }
-    .recipe-ingredients-used {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 14px;
-    }
-    .used-chip {
-      font-size: 11px;
-      padding: 3px 10px;
-      border-radius: 999px;
-      background: rgba(108,99,255,0.1);
-      color: var(--accent);
-      font-weight: 500;
-    }
-    .recipe-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .recipe-actions .neu-btn {
-      flex: 1;
-      min-width: 80px;
-      font-size: 13px;
-      padding: 10px 14px;
-    }
-
-    /* 리뷰 섹션 */
-    .review-section {
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(163,177,198,0.3);
-    }
-    .star-row {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 10px;
-    }
-    .star-btn {
-      font-size: 24px;
-      cursor: pointer;
-      transition: transform 0.2s;
-      background: none;
-      border: none;
-      padding: 0;
-    }
+    /* ── 레시피 탭 ── */
+    .recipe-prompt-card { background: var(--bg); border-radius: var(--r-card); box-shadow: var(--shadow-extruded); padding: 24px; margin-bottom: 20px; }
+    .recipe-prompt-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 6px; }
+    .recipe-prompt-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .selected-ingredients { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; min-height: 36px; }
+    .sel-chip { display: inline-flex; align-items: center; gap: 4px; background: var(--bg); box-shadow: var(--shadow-inset-sm); border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--accent); }
+    .sel-chip .chip-remove { font-size: 14px; color: var(--muted); cursor: pointer; margin-left: 2px; }
+    .recipe-options-row { display: flex; gap: 10px; margin-bottom: 16px; }
+    .recipe-option-btn { flex: 1; padding: 10px 8px; border-radius: var(--r-inner); font-size: 12px; font-weight: 600; background: var(--bg); box-shadow: var(--shadow-extruded-sm); color: var(--muted); transition: all var(--transition); cursor: pointer; text-align: center; border: none; }
+    .recipe-option-btn.on { box-shadow: var(--shadow-inset); color: var(--accent); }
+    .recipe-card { background: var(--bg); border-radius: var(--r-card); box-shadow: var(--shadow-extruded); padding: 22px; margin-bottom: 16px; transition: all var(--transition); }
+    .recipe-card:hover { box-shadow: var(--shadow-extruded-hover); transform: translateY(-2px); }
+    .recipe-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+    .recipe-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 1.3; flex: 1; }
+    .recipe-title-icon { font-size: 28px; margin-left: 10px; }
+    .recipe-meta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .recipe-meta-tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; box-shadow: var(--shadow-inset-sm); color: var(--muted); }
+    .recipe-steps-preview { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+    .recipe-ingredients-used { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .used-chip { font-size: 11px; padding: 3px 10px; border-radius: 999px; background: rgba(108,99,255,0.1); color: var(--accent); font-weight: 500; }
+    .recipe-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .recipe-actions .neu-btn { flex: 1; min-width: 80px; font-size: 13px; padding: 10px 14px; }
+    .review-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(163,177,198,0.3); }
+    .star-row { display: flex; gap: 4px; margin-bottom: 10px; }
+    .star-btn { font-size: 24px; cursor: pointer; transition: transform 0.2s; background: none; border: none; padding: 0; }
     .star-btn:hover { transform: scale(1.2); }
-    .review-input {
-      width: 100%;
-      background: var(--bg);
-      border: none;
-      outline: none;
-      border-radius: var(--r-inner);
-      box-shadow: var(--shadow-inset);
-      padding: 10px 14px;
-      color: var(--fg);
-      font-size: 13px;
-      resize: none;
-      min-height: 70px;
-      transition: box-shadow var(--transition);
-    }
+    .review-input { width: 100%; background: var(--bg); border: none; outline: none; border-radius: var(--r-inner); box-shadow: var(--shadow-inset); padding: 10px 14px; color: var(--fg); font-size: 13px; resize: none; min-height: 70px; transition: box-shadow var(--transition); }
     .review-input:focus { box-shadow: var(--shadow-inset-deep); }
     .review-input::placeholder { color: #A0AEC0; }
-    .review-submit {
-      margin-top: 8px;
-      font-size: 13px;
-      padding: 9px 18px;
-    }
-
-    /* 레시피 detail expand */
-    .recipe-detail {
-      display: none;
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(163,177,198,0.3);
-    }
+    .recipe-detail { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(163,177,198,0.3); }
     .recipe-detail.open { display: block; }
-    .step-list {
-      list-style: none;
-      counter-reset: steps;
-    }
-    .step-item {
-      counter-increment: steps;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 10px;
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--fg);
-    }
-    .step-num {
-      flex-shrink: 0;
-      width: 24px;
-      height: 24px;
-      border-radius: 999px;
-      background: var(--bg);
-      box-shadow: var(--shadow-inset-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--accent);
-      margin-top: 1px;
-    }
+    .step-list { list-style: none; }
+    .step-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 13px; line-height: 1.6; }
+    .step-num { flex-shrink: 0; width: 24px; height: 24px; border-radius: 999px; background: var(--bg); box-shadow: var(--shadow-inset-sm); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--accent); margin-top: 1px; }
+    .ai-loading { text-align: center; padding: 48px 24px; }
+    .ai-spinner { width: 64px; height: 64px; border-radius: 50%; box-shadow: var(--shadow-extruded); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 28px; animation: spin 2s linear infinite; }
+    .ai-loading-text { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
 
-    /* AI 로딩 */
-    .ai-loading {
-      text-align: center;
-      padding: 48px 24px;
-    }
-    .ai-spinner {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      box-shadow: var(--shadow-extruded);
-      margin: 0 auto 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      animation: spin 2s linear infinite;
-    }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .ai-loading-text {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-    .ai-loading-sub {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    /* ==============================
-       PAGE: SAVED (저장된 레시피)
-    ============================== */
-    .saved-recipe-card {
-      background: var(--bg);
-      border-radius: var(--r-card);
-      box-shadow: var(--shadow-extruded);
-      padding: 20px;
-      margin-bottom: 14px;
-      transition: all var(--transition);
-    }
-    .saved-recipe-card:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-extruded-hover);
-    }
-    .saved-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    .saved-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    /* ── 저장됨 탭 ── */
+    .saved-recipe-card { background: var(--bg); border-radius: var(--r-card); box-shadow: var(--shadow-extruded); padding: 20px; margin-bottom: 14px; transition: all var(--transition); }
+    .saved-recipe-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-extruded-hover); }
+    .saved-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .saved-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; }
     .saved-meta { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
-    .saved-review {
-      font-size: 13px;
-      color: var(--fg);
-      padding: 8px 12px;
-      border-radius: var(--r-inner);
-      box-shadow: var(--shadow-inset-sm);
-      margin-bottom: 8px;
-    }
-    .saved-actions {
-      display: flex;
-      gap: 8px;
-    }
-    .saved-actions .neu-btn { font-size: 12px; padding: 8px 14px; }
+    .saved-review { font-size: 13px; color: var(--fg); padding: 8px 12px; border-radius: var(--r-inner); box-shadow: var(--shadow-inset-sm); margin-bottom: 8px; }
 
-    /* ==============================
-       ANIMATIONS
-    ============================== */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes slideUp {
-      from { transform: translateY(60px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
-    }
-    .float-anim { animation: float 3s ease-in-out infinite; }
+    /* ── 설정 ── */
+    .settings-card { background: var(--bg); border-radius: var(--r-card); box-shadow: var(--shadow-extruded); padding: 24px; margin-bottom: 16px; }
+    .settings-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .save-notice { font-size: 11px; color: var(--muted); margin-top: 8px; }
 
-    /* ==============================
-       INGREDIENT RECIPE CHECK
-    ============================== */
-    .recipe-check {
-      width: 22px;
-      height: 22px;
-      border-radius: 8px;
-      box-shadow: var(--shadow-extruded-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex-shrink: 0;
-      font-size: 13px;
-      transition: all var(--transition);
-    }
-    .recipe-check.checked {
-      box-shadow: var(--shadow-inset-sm);
-      color: var(--accent);
-    }
-    .recipe-check:not(.checked) { color: transparent; }
-
-    /* ==============================
-       NOTIFICATION TOAST
-    ============================== */
-    .toast {
-      position: fixed;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--fg);
-      color: #fff;
-      border-radius: 999px;
-      padding: 10px 22px;
-      font-size: 13px;
-      font-weight: 600;
-      z-index: 999;
-      opacity: 0;
-      transition: opacity 0.3s;
-      white-space: nowrap;
-    }
+    /* ── 토스트 ── */
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--fg); color: #fff; border-radius: 999px; padding: 10px 22px; font-size: 13px; font-weight: 600; z-index: 999; opacity: 0; transition: opacity 0.3s; white-space: nowrap; pointer-events: none; }
     .toast.show { opacity: 1; }
 
-    /* ==============================
-       RESPONSIVE
-    ============================== */
-    @media (min-width: 480px) {
-      .app-container { padding: 0 24px 100px; }
-      .bottom-sheet { border-radius: 28px 28px 0 0; }
-    }
-
-    /* ==============================
-       SETTINGS (API KEY)
-    ============================== */
-    .settings-card {
-      background: var(--bg);
-      border-radius: var(--r-card);
-      box-shadow: var(--shadow-extruded);
-      padding: 24px;
-      margin-bottom: 16px;
-    }
-    .settings-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .api-key-input {
-      font-size: 13px;
-      letter-spacing: 0.04em;
-    }
-    .save-notice {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 8px;
-    }
+    /* ── 애니메이션 ── */
+    @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes float   { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes spin    { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-<!-- ==============================
-     TOAST
-============================== -->
 <div class="toast" id="toast"></div>
 
-<!-- ==============================
-     HEADER
-============================== -->
+<!-- 헤더 -->
 <div class="app-header">
   <div class="app-container">
     <div class="header-inner">
       <div class="app-logo">
-        <div class="logo-icon float-anim">🧊</div>
+        <div class="logo-icon">🧊</div>
         <div>
           <div>냉장고를 부탁해</div>
           <div class="header-subtitle">AI 냉장고 레시피 매니저</div>
@@ -1055,37 +273,21 @@
   </div>
 </div>
 
-<!-- ==============================
-     MAIN APP CONTAINER
-============================== -->
+<!-- 메인 -->
 <div class="app-container">
 
-  <!-- ===== PAGE: 냉장고 (재료 관리) ===== -->
+  <!-- 냉장고 탭 -->
   <div class="page active" id="page-fridge">
-    <!-- 요약 -->
-    <div class="fridge-summary" id="fridge-summary">
-      <div class="summary-item">
-        <div class="summary-num" id="sum-total">0</div>
-        <div class="summary-label">전체 재료</div>
-      </div>
+    <div class="fridge-summary">
+      <div class="summary-item"><div class="summary-num" id="sum-total">0</div><div class="summary-label">전체 재료</div></div>
       <div class="summary-divider"></div>
-      <div class="summary-item">
-        <div class="summary-num warn" id="sum-expiring">0</div>
-        <div class="summary-label">곧 만료</div>
-      </div>
+      <div class="summary-item"><div class="summary-num warn" id="sum-expiring">0</div><div class="summary-label">곧 만료</div></div>
       <div class="summary-divider"></div>
-      <div class="summary-item">
-        <div class="summary-num text-teal" id="sum-recipe-check">0</div>
-        <div class="summary-label">레시피 선택</div>
-      </div>
+      <div class="summary-item"><div class="summary-num text-teal" id="sum-recipe-check">0</div><div class="summary-label">레시피 선택</div></div>
       <div class="summary-divider"></div>
-      <div class="summary-item">
-        <div class="summary-num" id="sum-consumed" style="color:var(--muted);">0</div>
-        <div class="summary-label">소진됨</div>
-      </div>
+      <div class="summary-item"><div class="summary-num" id="sum-consumed" style="color:var(--muted);">0</div><div class="summary-label">소진됨</div></div>
     </div>
 
-    <!-- 카테고리 탭 -->
     <div class="cat-tabs" id="fridge-cat-tabs">
       <button class="cat-tab active" data-cat="all">전체</button>
       <button class="cat-tab" data-cat="main">🥩 메인</button>
@@ -1093,191 +295,136 @@
       <button class="cat-tab" data-cat="sauce">🫙 소스</button>
     </div>
 
-    <!-- 재료 리스트 -->
-    <div class="ingredient-list" id="ingredient-list">
-      <div class="empty-state">
-        <div class="empty-icon float-anim">🧊</div>
-        <div class="empty-text">냉장고가 비어있어요</div>
-        <div class="empty-sub text-muted">+ 버튼으로 재료를 추가해보세요</div>
-      </div>
-    </div>
+    <div class="ingredient-list" id="ingredient-list"></div>
   </div>
 
-  <!-- ===== PAGE: 레시피 ===== -->
+  <!-- 레시피 탭 -->
   <div class="page" id="page-recipe">
-    <!-- 재료 선택 프롬프트 -->
     <div class="recipe-prompt-card">
       <div class="recipe-prompt-title">🍳 오늘의 레시피</div>
       <div class="recipe-prompt-sub">사용할 재료를 선택하거나 빠르게 추천받아보세요</div>
-
-      <!-- 선택된 재료 칩 -->
       <div class="selected-ingredients" id="selected-ingredients-display">
         <span class="text-muted" style="font-size:13px;padding:8px 0;">냉장고 탭에서 재료를 선택하거나 아래 옵션을 사용하세요</span>
       </div>
-
-      <!-- 옵션 버튼 -->
       <div class="recipe-options-row">
         <button class="recipe-option-btn" id="opt-expiring" onclick="toggleRecipeOption('expiring')">🚨 만료 임박</button>
-        <button class="recipe-option-btn" id="opt-all" onclick="toggleRecipeOption('all')">🎲 전체 재료</button>
-        <button class="recipe-option-btn" id="opt-healthy" onclick="toggleRecipeOption('healthy')">🥗 건강식 위주</button>
+        <button class="recipe-option-btn" id="opt-all"      onclick="toggleRecipeOption('all')">🎲 전체 재료</button>
+        <button class="recipe-option-btn" id="opt-healthy"  onclick="toggleRecipeOption('healthy')">🥗 건강식</button>
       </div>
-
-      <!-- 음식 타입 선택 -->
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-        <button class="cat-tab" id="mtype-all" onclick="setMealType('all')" style="font-size:12px;padding:6px 14px;">제한없음</button>
-        <button class="cat-tab" id="mtype-korean" onclick="setMealType('korean')" style="font-size:12px;padding:6px 14px;">🍚 한식</button>
-        <button class="cat-tab" id="mtype-western" onclick="setMealType('western')" style="font-size:12px;padding:6px 14px;">🍝 양식</button>
-        <button class="cat-tab" id="mtype-quick" onclick="setMealType('quick')" style="font-size:12px;padding:6px 14px;">⚡ 10분 요리</button>
+        <button class="cat-tab active" id="mtype-all"     onclick="setMealType('all')"     style="font-size:12px;padding:6px 14px;">제한없음</button>
+        <button class="cat-tab"        id="mtype-korean"  onclick="setMealType('korean')"  style="font-size:12px;padding:6px 14px;">🍚 한식</button>
+        <button class="cat-tab"        id="mtype-western" onclick="setMealType('western')" style="font-size:12px;padding:6px 14px;">🍝 양식</button>
+        <button class="cat-tab"        id="mtype-quick"   onclick="setMealType('quick')"   style="font-size:12px;padding:6px 14px;">⚡ 10분</button>
       </div>
-
-      <button class="neu-btn neu-btn-accent" style="width:100%;padding:14px;font-size:16px;border-radius:var(--r-btn);" onclick="generateRecipes()">
-        ✨ AI 레시피 추천받기
-      </button>
+      <button class="neu-btn neu-btn-accent" style="width:100%;padding:14px;font-size:16px;" onclick="generateRecipes()">✨ AI 레시피 추천받기</button>
     </div>
-
-    <!-- 레시피 결과 -->
     <div id="recipe-results"></div>
   </div>
 
-  <!-- ===== PAGE: 저장된 레시피 ===== -->
+  <!-- 저장됨 탭 -->
   <div class="page" id="page-saved">
     <div class="section-title">📚 저장한 레시피</div>
     <div id="saved-list"></div>
   </div>
 
-  <!-- ===== PAGE: 설정 ===== -->
+  <!-- 설정 탭 -->
   <div class="page" id="page-settings">
     <div class="section-title">⚙️ 설정</div>
 
-    <!-- AI 제공자 선택 -->
     <div class="settings-card">
-      <div class="settings-title">🤖 AI 제공자 선택</div>
+      <div class="settings-title">🤖 AI 제공자</div>
       <div class="cat-select-row" style="margin-bottom:0;">
-        <button class="cat-select-btn active" id="provider-claude" onclick="selectProvider('claude', this)">
+        <button class="cat-select-btn active" id="provider-claude" onclick="selectProvider('claude',this)" style="padding:14px 8px;">
           <div style="font-size:18px;margin-bottom:2px;">🟣</div>
           <div style="font-weight:700;font-size:13px;">Claude</div>
           <div style="font-size:10px;color:var(--muted);margin-top:2px;">Anthropic</div>
         </button>
-        <button class="cat-select-btn" id="provider-gemini" onclick="selectProvider('gemini', this)">
+        <button class="cat-select-btn" id="provider-gemini" onclick="selectProvider('gemini',this)" style="padding:14px 8px;">
           <div style="font-size:18px;margin-bottom:2px;">🔵</div>
           <div style="font-weight:700;font-size:13px;">Gemini</div>
           <div style="font-size:10px;color:var(--muted);margin-top:2px;">Google</div>
         </button>
+        <button class="cat-select-btn" id="provider-gpt" onclick="selectProvider('gpt',this)" style="padding:14px 8px;">
+          <div style="font-size:18px;margin-bottom:2px;">🟢</div>
+          <div style="font-weight:700;font-size:13px;">ChatGPT</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">OpenAI</div>
+        </button>
       </div>
     </div>
 
-    <!-- Claude 설정 -->
     <div class="settings-card" id="settings-claude">
-      <div class="settings-title">🟣 Claude API 설정</div>
+      <div class="settings-title">🟣 Claude 설정</div>
       <div class="form-group">
         <label class="form-label">API Key</label>
         <input type="password" class="neu-input" id="claude-key-input" placeholder="sk-ant-api03-..." />
-        <div class="save-notice">* Anthropic Console → API Keys에서 발급</div>
+        <div class="save-notice">Anthropic Console → API Keys</div>
       </div>
       <div class="form-group">
-        <label class="form-label">모델 선택</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="cat-select-btn active" id="cmodel-sonnet" onclick="selectClaudeModel('claude-sonnet-4-6', this)" style="flex:1;padding:10px 8px;">
-            <div style="font-weight:700;font-size:13px;">Sonnet</div>
-            <div style="font-size:10px;color:var(--muted);">빠름 · 균형</div>
-          </button>
-          <button class="cat-select-btn" id="cmodel-haiku" onclick="selectClaudeModel('claude-haiku-4-5-20251001', this)" style="flex:1;padding:10px 8px;">
-            <div style="font-weight:700;font-size:13px;">Haiku</div>
-            <div style="font-size:10px;color:var(--muted);">최저비용</div>
-          </button>
-          <button class="cat-select-btn" id="cmodel-opus" onclick="selectClaudeModel('claude-opus-4-6', this)" style="flex:1;padding:10px 8px;">
-            <div style="font-weight:700;font-size:13px;">Opus</div>
-            <div style="font-size:10px;color:var(--muted);">최고품질</div>
-          </button>
+        <label class="form-label">모델</label>
+        <div style="display:flex;gap:8px;">
+          <button class="cat-select-btn active" id="cmodel-sonnet" onclick="selectClaudeModel('claude-sonnet-4-6',this)" style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">Sonnet</div><div style="font-size:10px;color:var(--muted);">균형</div></button>
+          <button class="cat-select-btn"        id="cmodel-haiku"  onclick="selectClaudeModel('claude-haiku-4-5-20251001',this)" style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">Haiku</div><div style="font-size:10px;color:var(--muted);">저렴</div></button>
+          <button class="cat-select-btn"        id="cmodel-opus"   onclick="selectClaudeModel('claude-opus-4-6',this)" style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">Opus</div><div style="font-size:10px;color:var(--muted);">고품질</div></button>
         </div>
       </div>
       <button class="neu-btn neu-btn-accent" style="width:100%;padding:12px;" onclick="saveApiKey()">저장</button>
     </div>
 
-    <!-- Gemini 설정 -->
     <div class="settings-card" id="settings-gemini" style="display:none;">
-      <div class="settings-title">🔵 Gemini API 설정</div>
+      <div class="settings-title">🔵 Gemini 설정</div>
       <div class="form-group">
         <label class="form-label">API Key</label>
         <input type="password" class="neu-input" id="gemini-key-input" placeholder="AIzaSy..." />
-        <div class="save-notice">* Google AI Studio → Get API Key에서 발급</div>
+        <div class="save-notice">Google AI Studio → Get API Key</div>
       </div>
       <div class="form-group">
-        <label class="form-label">모델 선택</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="cat-select-btn active" id="gmodel-flash" onclick="selectGeminiModel('gemini-2.0-flash', this)" style="flex:1;padding:10px 8px;">
-            <div style="font-weight:700;font-size:13px;">Flash 2.0</div>
-            <div style="font-size:10px;color:var(--muted);">빠름 · 무료</div>
-          </button>
-          <button class="cat-select-btn" id="gmodel-pro" onclick="selectGeminiModel('gemini-2.5-pro', this)" style="flex:1;padding:10px 8px;">
-            <div style="font-weight:700;font-size:13px;">Pro 2.5</div>
-            <div style="font-size:10px;color:var(--muted);">고품질</div>
-          </button>
+        <label class="form-label">모델</label>
+        <div style="display:flex;gap:8px;">
+          <button class="cat-select-btn active" id="gmodel-flash" onclick="selectGeminiModel('gemini-2.0-flash',this)" style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">Flash 2.0</div><div style="font-size:10px;color:var(--muted);">무료·빠름</div></button>
+          <button class="cat-select-btn"        id="gmodel-pro"   onclick="selectGeminiModel('gemini-2.5-pro',this)"   style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">Pro 2.5</div><div style="font-size:10px;color:var(--muted);">고품질</div></button>
         </div>
       </div>
       <button class="neu-btn neu-btn-accent" style="width:100%;padding:12px;" onclick="saveApiKey()">저장</button>
     </div>
 
-    <!-- 현재 AI 상태 표시 -->
-    <div class="settings-card" id="api-status-card" style="padding:16px 24px;">
-      <div id="api-status-inner" style="display:flex;align-items:center;gap:10px;">
-        <div style="font-size:22px;">⚪</div>
-        <div>
-          <div style="font-size:13px;font-weight:600;color:var(--muted);">API 키 미설정</div>
-          <div style="font-size:11px;color:var(--muted);">위에서 키를 입력하고 저장하세요</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Cloudflare Worker 설정 -->
-    <div class="settings-card">
-      <div class="settings-title">☁️ Cloudflare Worker</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6;">
-        Worker URL을 설정하면 API 키를 브라우저에 저장하지 않아도 됩니다.<br>
-        재료·레시피도 Notion DB에 자동으로 저장됩니다.
+    <div class="settings-card" id="settings-gpt" style="display:none;">
+      <div class="settings-title">🟢 ChatGPT 설정</div>
+      <div class="form-group">
+        <label class="form-label">API Key</label>
+        <input type="password" class="neu-input" id="gpt-key-input" placeholder="sk-proj-..." />
+        <div class="save-notice">platform.openai.com → API Keys</div>
       </div>
       <div class="form-group">
-        <label class="form-label">Worker URL</label>
-        <input type="url" class="neu-input" id="worker-url-input"
-          placeholder="https://fridge-worker.[id].workers.dev" />
-        <div class="save-notice">* Worker 배포 후 발급되는 URL</div>
-      </div>
-      <button class="neu-btn" style="width:100%;padding:11px;margin-bottom:10px;" onclick="testWorker()">
-        🔍 연결 테스트
-      </button>
-      <button class="neu-btn neu-btn-accent" style="width:100%;padding:12px;" onclick="saveWorkerUrl()">
-        저장
-      </button>
-      <!-- Worker 상태 뱃지 -->
-      <div id="worker-status" style="margin-top:12px;display:none;">
-        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--r-inner);box-shadow:var(--shadow-inset-sm);">
-          <span id="worker-status-icon" style="font-size:18px;">⚪</span>
-          <div>
-            <div id="worker-status-text" style="font-size:13px;font-weight:600;"></div>
-            <div id="worker-status-sub" style="font-size:11px;color:var(--muted);"></div>
-          </div>
+        <label class="form-label">모델</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="cat-select-btn active" id="gmodel-4o-mini" onclick="selectGptModel('gpt-4o-mini',this)" style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">4o mini</div><div style="font-size:10px;color:var(--muted);">저렴·빠름</div></button>
+          <button class="cat-select-btn"        id="gmodel-4o"      onclick="selectGptModel('gpt-4o',this)"      style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">4o</div><div style="font-size:10px;color:var(--muted);">균형</div></button>
+          <button class="cat-select-btn"        id="gmodel-o4-mini" onclick="selectGptModel('o4-mini',this)"     style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">o4 mini</div><div style="font-size:10px;color:var(--muted);">추론</div></button>
         </div>
+      </div>
+      <button class="neu-btn neu-btn-accent" style="width:100%;padding:12px;" onclick="saveApiKey()">저장</button>
+    </div>
+
+    <div class="settings-card" style="padding:16px 24px;">
+      <div id="api-status-inner" style="display:flex;align-items:center;gap:10px;">
+        <div style="font-size:22px;">⚪</div>
+        <div><div style="font-size:13px;font-weight:600;color:var(--muted);">API 키 미설정</div><div style="font-size:11px;color:var(--muted);">위에서 키를 입력하고 저장하세요</div></div>
       </div>
     </div>
 
-    <!-- 데이터 저장소 선택 -->
     <div class="settings-card">
-      <div class="settings-title">💾 데이터 저장소</div>
-      <div class="cat-select-row">
-        <button class="cat-select-btn active" id="storage-local" onclick="selectStorage('local', this)" style="padding:12px 8px;">
-          <div style="font-size:20px;margin-bottom:4px;">📱</div>
-          <div style="font-weight:700;font-size:12px;">로컬</div>
-          <div style="font-size:10px;color:var(--muted);">이 기기에만</div>
-        </button>
-        <button class="cat-select-btn" id="storage-notion" onclick="selectStorage('notion', this)" style="padding:12px 8px;">
-          <div style="font-size:20px;margin-bottom:4px;">📝</div>
-          <div style="font-weight:700;font-size:12px;">Notion</div>
-          <div style="font-size:10px;color:var(--muted);">Worker 필요</div>
-        </button>
+      <div class="settings-title">☁️ Cloudflare Worker</div>
+      <div class="form-group">
+        <label class="form-label">Worker URL</label>
+        <input type="url" class="neu-input" id="worker-url-input" placeholder="https://fridge-worker.[id].workers.dev" />
+        <div class="save-notice">설정하면 API 키가 브라우저에 노출되지 않아요</div>
       </div>
-      <div id="storage-notice" style="margin-top:10px;font-size:12px;color:var(--muted);padding:10px 12px;border-radius:var(--r-inner);box-shadow:var(--shadow-inset-sm);">
-        📱 현재: 이 기기 브라우저에만 저장됩니다.
+      <div style="display:flex;gap:8px;">
+        <button class="neu-btn" style="flex:1;padding:11px;font-size:13px;" onclick="testWorker()">🔍 연결 테스트</button>
+        <button class="neu-btn neu-btn-accent" style="flex:1;padding:11px;font-size:13px;" onclick="saveWorkerUrl()">저장</button>
       </div>
+      <div id="worker-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:var(--r-inner);box-shadow:var(--shadow-inset-sm);font-size:13px;"></div>
     </div>
 
     <div class="settings-card">
@@ -1288,82 +435,53 @@
     <div class="settings-card" style="text-align:center;">
       <div style="font-size:32px;margin-bottom:8px;">🧊</div>
       <div class="font-display" style="font-weight:700;font-size:16px;margin-bottom:4px;">냉장고를 부탁해</div>
-      <div class="text-muted" style="font-size:12px;">v1.2.0 · Worker + Notion 지원</div>
+      <div class="text-muted" style="font-size:12px;">v1.3.0 · Claude & Gemini · Worker 지원</div>
     </div>
   </div>
 
-</div><!-- end app-container -->
+</div>
 
-<!-- ==============================
-     FAB
-============================== -->
+<!-- FAB -->
 <button class="fab" id="fab-add" onclick="openAddModal()" aria-label="재료 추가">+</button>
 
-<!-- ==============================
-     BOTTOM NAV
-============================== -->
+<!-- 바텀 네비 -->
 <nav class="bottom-nav">
   <div class="nav-items">
-    <button class="nav-item active" data-page="fridge" onclick="showPage('fridge')">
-      <span class="nav-icon">🧊</span>
-      냉장고
-    </button>
-    <button class="nav-item" data-page="recipe" onclick="showPage('recipe')">
-      <span class="nav-icon">🍳</span>
-      레시피
-    </button>
-    <button class="nav-item" data-page="saved" onclick="showPage('saved')">
-      <span class="nav-icon">📚</span>
-      저장됨
-    </button>
+    <button class="nav-item active" data-page="fridge" onclick="showPage('fridge')"><span class="nav-icon">🧊</span>냉장고</button>
+    <button class="nav-item" data-page="recipe" onclick="showPage('recipe')"><span class="nav-icon">🍳</span>레시피</button>
+    <button class="nav-item" data-page="saved"  onclick="showPage('saved')"><span class="nav-icon">📚</span>저장됨</button>
   </div>
 </nav>
 
-<!-- ==============================
-     ADD INGREDIENT MODAL
-============================== -->
-<div class="modal-overlay" id="add-modal" onclick="handleOverlayClick(event)">
+<!-- 재료 추가 모달 -->
+<div class="modal-overlay" id="add-modal">
   <div class="bottom-sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">재료 추가하기</div>
-
-    <!-- 카테고리 선택 -->
     <div class="form-group">
       <label class="form-label">카테고리</label>
       <div class="cat-select-row">
-        <button class="cat-select-btn active" data-cat="main" onclick="selectCat('main', this)">🥩 메인</button>
-        <button class="cat-select-btn" data-cat="sub" onclick="selectCat('sub', this)">🧅 서브</button>
-        <button class="cat-select-btn" data-cat="sauce" onclick="selectCat('sauce', this)">🫙 소스</button>
+        <button class="cat-select-btn active" data-cat="main"  onclick="selectAddCat('main',this)">🥩 메인</button>
+        <button class="cat-select-btn"        data-cat="sub"   onclick="selectAddCat('sub',this)">🧅 서브</button>
+        <button class="cat-select-btn"        data-cat="sauce" onclick="selectAddCat('sauce',this)">🫙 소스</button>
       </div>
     </div>
-
-    <!-- 이모지 선택 -->
     <div class="form-group">
       <label class="form-label">이모지</label>
-      <div class="emoji-row" id="emoji-picker">
-        <!-- JS로 채움 -->
-      </div>
+      <div class="emoji-row" id="emoji-picker"></div>
     </div>
-
-    <!-- 이름 입력 -->
     <div class="form-group">
       <label class="form-label">재료명</label>
       <input type="text" class="neu-input" id="ingr-name" placeholder="예: 두부, 간장, 파 ..." />
     </div>
-
-    <!-- 단위 -->
     <div class="form-group">
       <label class="form-label">단위 <span style="font-weight:400;color:var(--muted);font-size:11px;">(선택)</span></label>
       <input type="text" class="neu-input" id="ingr-unit" placeholder="개 / 묶음 / 병 / kg ..." />
     </div>
-
-    <!-- 입력일 (자동) -->
     <div class="form-group">
       <label class="form-label">입력일</label>
       <input type="date" class="neu-input" id="ingr-adddate" />
     </div>
-
-    <!-- 유통기한 (옵션) -->
     <div class="form-group">
       <label class="form-label">유통기한</label>
       <div class="date-row">
@@ -1371,1075 +489,658 @@
         <input type="date" class="neu-input" id="ingr-expiry" style="display:none;" />
       </div>
     </div>
-
     <div class="sheet-actions">
       <button class="neu-btn" onclick="closeAddModal()">취소</button>
-      <button class="neu-btn neu-btn-accent" onclick="addIngredient()">재료 추가</button>
+      <button class="neu-btn neu-btn-accent" onclick="addIngredient()">추가</button>
     </div>
   </div>
 </div>
 
-<!-- ==============================
-     EDIT INGREDIENT MODAL
-============================== -->
-<div class="modal-overlay" id="edit-modal" onclick="handleEditOverlayClick(event)">
+<!-- 재료 수정 모달 -->
+<div class="modal-overlay" id="edit-modal">
   <div class="bottom-sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">재료 수정</div>
     <input type="hidden" id="edit-id" />
-
     <div class="form-group">
       <label class="form-label">카테고리</label>
       <div class="cat-select-row" id="edit-cat-row">
-        <button class="cat-select-btn active" data-cat="main" onclick="selectEditCat('main', this)">🥩 메인</button>
-        <button class="cat-select-btn" data-cat="sub" onclick="selectEditCat('sub', this)">🧅 서브</button>
-        <button class="cat-select-btn" data-cat="sauce" onclick="selectEditCat('sauce', this)">🫙 소스</button>
+        <button class="cat-select-btn active" data-cat="main"  onclick="selectEditCat('main',this)">🥩 메인</button>
+        <button class="cat-select-btn"        data-cat="sub"   onclick="selectEditCat('sub',this)">🧅 서브</button>
+        <button class="cat-select-btn"        data-cat="sauce" onclick="selectEditCat('sauce',this)">🫙 소스</button>
       </div>
     </div>
-
     <div class="form-group">
       <label class="form-label">이모지</label>
       <div class="emoji-row" id="edit-emoji-picker"></div>
     </div>
-
     <div class="form-group">
       <label class="form-label">재료명</label>
       <input type="text" class="neu-input" id="edit-name" />
     </div>
-
     <div class="form-group">
       <label class="form-label">단위 <span style="font-weight:400;color:var(--muted);font-size:11px;">(선택)</span></label>
       <input type="text" class="neu-input" id="edit-unit" placeholder="개 / 묶음 / 병 / kg ..." />
     </div>
-
     <div class="form-group">
       <label class="form-label">입력일</label>
       <input type="date" class="neu-input" id="edit-adddate" />
     </div>
-
     <div class="form-group">
       <label class="form-label">유통기한</label>
       <div class="date-row">
-        <button class="toggle-btn on" id="edit-exp-toggle" onclick="toggleEditExpiry()">유통기한 입력중</button>
-        <input type="date" class="neu-input" id="edit-expiry" />
+        <button class="toggle-btn" id="edit-exp-toggle" onclick="toggleEditExpiry()">+ 유통기한 입력</button>
+        <input type="date" class="neu-input" id="edit-expiry" style="display:none;" />
       </div>
     </div>
-
     <div class="sheet-actions">
-      <button class="neu-btn neu-btn-danger" onclick="deleteIngredientFromEdit()">삭제</button>
+      <button class="neu-btn" style="color:var(--danger);" onclick="deleteIngredientFromEdit()">삭제</button>
       <button class="neu-btn neu-btn-accent" onclick="saveEditIngredient()">저장</button>
     </div>
   </div>
 </div>
 
 <script>
-// ============================================================
-//   STATE & STORAGE
-// ============================================================
-let state = {
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+const S = {
   ingredients: [],
   savedRecipes: [],
-  apiKey: '',
-  geminiKey: '',
-  provider: 'claude',           // 'claude' | 'gemini'
+  currentRecipes: [],
+  currentCat: 'all',
+  addCat: 'main',
+  editCat: 'main',
+  addEmoji: '🥩',
+  editEmoji: '🥩',
+  addExpOn: false,
+  editExpOn: false,
+  provider: 'claude',
   claudeModel: 'claude-sonnet-4-6',
   geminiModel: 'gemini-2.0-flash',
-  currentCat: 'all',
-  selectedEmoji: '🥩',
-  editSelectedEmoji: '🥩',
-  editExpOn: true,
-  addExpOn: false,
+  apiKey: '',
+  geminiKey: '',
+  workerUrl: '',
+  gptKey: '',
+  gptModel: 'gpt-4o-mini',
   recipeOptions: { expiring: false, all: false, healthy: false },
   mealType: 'all',
-  currentRecipes: [],
 };
 
-function saveState() {
-  localStorage.setItem('fridge_ingredients', JSON.stringify(state.ingredients));
-  localStorage.setItem('fridge_saved_recipes', JSON.stringify(state.savedRecipes));
+// ═══════════════════════════════════════════
+//  PERSIST
+// ═══════════════════════════════════════════
+function persist() {
+  localStorage.setItem('fridge_v2_ingredients',   JSON.stringify(S.ingredients));
+  localStorage.setItem('fridge_v2_saved_recipes', JSON.stringify(S.savedRecipes));
 }
 
-function loadState() {
+function hydrate() {
   try {
-    const ingr = localStorage.getItem('fridge_ingredients');
-    if (ingr) state.ingredients = JSON.parse(ingr);
-    const saved = localStorage.getItem('fridge_saved_recipes');
-    if (saved) state.savedRecipes = JSON.parse(saved);
-
-    // Claude
-    const claudeKey = localStorage.getItem('fridge_api_key');
-    if (claudeKey) { state.apiKey = claudeKey; document.getElementById('claude-key-input').value = claudeKey; }
-    const claudeModel = localStorage.getItem('fridge_claude_model');
-    if (claudeModel) { state.claudeModel = claudeModel; }
-
-    // Gemini
-    const geminiKey = localStorage.getItem('fridge_gemini_key');
-    if (geminiKey) { state.geminiKey = geminiKey; document.getElementById('gemini-key-input').value = geminiKey; }
-    const geminiModel = localStorage.getItem('fridge_gemini_model');
-    if (geminiModel) { state.geminiModel = geminiModel; }
-
-    // 제공자 복원
-    const provider = localStorage.getItem('fridge_provider') || 'claude';
-    state.provider = provider;
-    const provBtn = document.getElementById('provider-' + provider);
-    if (provBtn) {
-      document.querySelectorAll('[id^="provider-"]').forEach(b => b.classList.remove('active'));
-      provBtn.classList.add('active');
-      document.getElementById('settings-claude').style.display = provider === 'claude' ? 'block' : 'none';
-      document.getElementById('settings-gemini').style.display = provider === 'gemini' ? 'block' : 'none';
-    }
-
-    // 모델 버튼 복원
-    if (claudeModel) {
-      const modelMap = { 'claude-sonnet-4-6': 'cmodel-sonnet', 'claude-haiku-4-5-20251001': 'cmodel-haiku', 'claude-opus-4-6': 'cmodel-opus' };
-      const btnId = modelMap[claudeModel];
-      if (btnId) { document.querySelectorAll('[id^="cmodel-"]').forEach(b => b.classList.remove('active')); document.getElementById(btnId)?.classList.add('active'); }
-    }
-    if (geminiModel) {
-      const modelMap = { 'gemini-2.0-flash': 'gmodel-flash', 'gemini-2.5-pro': 'gmodel-pro' };
-      const btnId = modelMap[geminiModel];
-      if (btnId) { document.querySelectorAll('[id^="gmodel-"]').forEach(b => b.classList.remove('active')); document.getElementById(btnId)?.classList.add('active'); }
-    }
-
-    // Worker URL + 저장소 타입 복원
-    const workerUrl = localStorage.getItem('fridge_worker_url');
-    if (workerUrl) {
-      state.workerUrl = workerUrl;
-      const inp = document.getElementById('worker-url-input');
-      if (inp) inp.value = workerUrl;
-    }
-    const storageType = localStorage.getItem('fridge_storage') || 'local';
-    state.storageType = storageType;
-    const storageBtn = document.getElementById('storage-' + storageType);
-    if (storageBtn) {
-      document.querySelectorAll('[id^="storage-"]').forEach(b => b.classList.remove('active'));
-      storageBtn.classList.add('active');
-      const notice = document.getElementById('storage-notice');
-      if (notice) {
-        notice.textContent = storageType === 'notion'
-          ? '📝 재료와 레시피가 Notion DB에 저장됩니다.'
-          : '📱 현재: 이 기기 브라우저에만 저장됩니다.';
-      }
-    }
-
-    updateApiStatus();
+    const i = localStorage.getItem('fridge_v2_ingredients');
+    if (i) S.ingredients = JSON.parse(i);
   } catch(e) {}
+  try {
+    const r = localStorage.getItem('fridge_v2_saved_recipes');
+    if (r) S.savedRecipes = JSON.parse(r);
+  } catch(e) {}
+
+  // 설정값 (DOM 건드리지 않고 state만 복원)
+  S.apiKey      = localStorage.getItem('fridge_api_key')       || '';
+  S.geminiKey   = localStorage.getItem('fridge_gemini_key')    || '';
+  S.provider    = localStorage.getItem('fridge_provider')      || 'claude';
+  S.claudeModel = localStorage.getItem('fridge_claude_model')  || 'claude-sonnet-4-6';
+  S.geminiModel = localStorage.getItem('fridge_gemini_model')  || 'gemini-2.0-flash';
+  S.workerUrl   = localStorage.getItem('fridge_worker_url')    || '';
+  S.gptKey      = localStorage.getItem('fridge_gpt_key')        || '';
+  S.gptModel    = localStorage.getItem('fridge_gpt_model')      || 'gpt-4o-mini';
 }
 
-// ============================================================
-//   NAVIGATION
-// ============================================================
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+function today() { return new Date().toISOString().split('T')[0]; }
+function daysUntil(d) {
+  if (!d) return null;
+  return Math.ceil((new Date(d) - new Date(today())) / 86400000);
+}
+function fmt(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  return `${dt.getMonth()+1}/${dt.getDate()}`;
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+const EMOJIS = {
+  main:  ['🥩','🐔','🐟','🥚','🍖','🦐','🦑','🥓','🍗','🧀'],
+  sub:   ['🧅','🧄','🥦','🌽','🥕','🍆','🥬','🌿','🍄','🫑'],
+  sauce: ['🫙','🫒','🧂','🍯','🌶️','🍋','🫚','🥫','🧴','🫗'],
+};
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const page = document.getElementById('page-' + name);
-  if (page) page.classList.add('active');
-  const navItem = document.querySelector(`.nav-item[data-page="${name}"]`);
-  if (navItem) navItem.classList.add('active');
-
-  const fab = document.getElementById('fab-add');
-  fab.style.display = (name === 'fridge') ? 'flex' : 'none';
-
-  if (name === 'fridge') renderIngredients();
-  if (name === 'recipe') renderRecipePage();
-  if (name === 'saved') renderSaved();
-  if (name === 'settings') {}
+  document.getElementById('page-' + name).classList.add('active');
+  const nav = document.querySelector(`.nav-item[data-page="${name}"]`);
+  if (nav) nav.classList.add('active');
+  document.getElementById('fab-add').style.display = name === 'fridge' ? 'flex' : 'none';
+  if (name === 'fridge')   renderIngredients();
+  if (name === 'recipe')   renderRecipePage();
+  if (name === 'saved')    renderSaved();
+  if (name === 'settings') syncSettingsUI();
 }
 
-// ============================================================
-//   DATE HELPERS
-// ============================================================
-function today() {
-  return new Date().toISOString().split('T')[0];
-}
-function daysUntil(dateStr) {
-  if (!dateStr) return null;
-  const diff = new Date(dateStr) - new Date(today());
-  return Math.ceil(diff / (1000*60*60*24));
-}
-function formatDate(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  return `${d.getMonth()+1}/${d.getDate()}`;
-}
-
-// ============================================================
-//   EMOJI SETS
-// ============================================================
-const EMOJIS = {
-  main:  ['🥩','🐔','🐟','🥚','🍖','🦐','🦑','🥓','🍗','🫀'],
-  sub:   ['🧅','🧄','🥦','🌽','🥕','🍆','🧅','🥬','🌿','🍄'],
-  sauce: ['🫙','🫒','🧂','🍯','🧴','🫗','🌶️','🍋','🫚','🥫'],
-};
-
-function buildEmojiPicker(containerId, currentEmoji, catKey, onSelectFn) {
-  const container = document.getElementById(containerId);
-  const emojis = EMOJIS[catKey] || EMOJIS.main;
-  container.innerHTML = emojis.map(e =>
-    `<div class="emoji-opt${e === currentEmoji ? ' selected' : ''}" onclick="${onSelectFn}('${e}', this)">${e}</div>`
-  ).join('');
-}
-
-function selectEmoji(emoji, el) {
-  state.selectedEmoji = emoji;
-  document.querySelectorAll('#emoji-picker .emoji-opt').forEach(e => e.classList.remove('selected'));
-  el.classList.add('selected');
-}
-function selectEditEmoji(emoji, el) {
-  state.editSelectedEmoji = emoji;
-  document.querySelectorAll('#edit-emoji-picker .emoji-opt').forEach(e => e.classList.remove('selected'));
-  el.classList.add('selected');
-}
-
-// ============================================================
-//   ADD INGREDIENT MODAL
-// ============================================================
-let addCatSelected = 'main';
-
-function openAddModal() {
-  addCatSelected = 'main';
-  state.selectedEmoji = '🥩';
-  state.addExpOn = false;
-  document.getElementById('ingr-name').value = '';
-  document.getElementById('ingr-unit').value = '';
-  document.getElementById('ingr-adddate').value = today();
-  document.getElementById('ingr-expiry').value = '';
-  document.getElementById('ingr-expiry').style.display = 'none';
-  document.getElementById('exp-toggle').textContent = '+ 유통기한 입력';
-  document.getElementById('exp-toggle').classList.remove('on');
-  // Reset cat buttons
-  document.querySelectorAll('#add-modal .cat-select-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.cat === 'main');
-  });
-  buildEmojiPicker('emoji-picker', '🥩', 'main', 'selectEmoji');
-  document.getElementById('add-modal').classList.add('open');
-  setTimeout(() => document.getElementById('ingr-name').focus(), 300);
-}
-
-function closeAddModal() {
-  document.getElementById('add-modal').classList.remove('open');
-}
-
-function handleOverlayClick(e) {
-  if (e.target === document.getElementById('add-modal')) closeAddModal();
-}
-
-function selectCat(cat, el) {
-  addCatSelected = cat;
-  document.querySelectorAll('#add-modal .cat-select-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  // Update emoji picker
-  const defaultEmojis = { main: '🥩', sub: '🧅', sauce: '🫙' };
-  state.selectedEmoji = defaultEmojis[cat];
-  buildEmojiPicker('emoji-picker', state.selectedEmoji, cat, 'selectEmoji');
-}
-
-
-function toggleExpiry() {
-  state.addExpOn = !state.addExpOn;
-  const inp = document.getElementById('ingr-expiry');
-  const btn = document.getElementById('exp-toggle');
-  inp.style.display = state.addExpOn ? 'block' : 'none';
-  btn.textContent = state.addExpOn ? '유통기한 입력중' : '+ 유통기한 입력';
-  btn.classList.toggle('on', state.addExpOn);
-  if (state.addExpOn) inp.focus();
-}
-
-async function addIngredient() {
-  const name = document.getElementById('ingr-name').value.trim();
-  if (!name) { showToast('재료명을 입력해주세요'); return; }
-  const id = Date.now().toString();
-  const ingr = {
-    id,
-    name,
-    cat: addCatSelected,
-    emoji: state.selectedEmoji,
-    unit: document.getElementById('ingr-unit').value.trim() || '개',
-    addDate: document.getElementById('ingr-adddate').value || today(),
-    expiry: state.addExpOn ? document.getElementById('ingr-expiry').value : '',
-    checked: false,
-  };
-  state.ingredients.push(ingr);
-  saveState();
-  closeAddModal();
-  renderIngredients();
-  await apiSaveIngredient(ingr); // Notion 저장 (Worker 있을 때만)
-  showToast(`${ingr.emoji} ${name} 추가됨`);
-}
-
-// ============================================================
-//   EDIT MODAL
-// ============================================================
-function openEditModal(id) {
-  const ingr = state.ingredients.find(i => i.id === id);
-  if (!ingr) return;
-  document.getElementById('edit-id').value = id;
-  document.getElementById('edit-name').value = ingr.name;
-  document.getElementById('edit-unit').value = ingr.unit;
-  document.getElementById('edit-adddate').value = ingr.addDate;
-  document.getElementById('edit-expiry').value = ingr.expiry || '';
-  state.editSelectedEmoji = ingr.emoji;
-  state.editExpOn = !!ingr.expiry;
-  const expInp = document.getElementById('edit-expiry');
-  const expBtn = document.getElementById('edit-exp-toggle');
-  expInp.style.display = state.editExpOn ? 'block' : 'none';
-  expBtn.textContent = state.editExpOn ? '유통기한 입력중' : '+ 유통기한 입력';
-  expBtn.classList.toggle('on', state.editExpOn);
-  // Cat buttons
-  document.querySelectorAll('#edit-cat-row .cat-select-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.cat === ingr.cat);
-  });
-  buildEmojiPicker('edit-emoji-picker', ingr.emoji, ingr.cat, 'selectEditEmoji');
-  document.getElementById('edit-modal').classList.add('open');
-}
-
-function handleEditOverlayClick(e) {
-  if (e.target === document.getElementById('edit-modal')) closeEditModal();
-}
-function closeEditModal() {
-  document.getElementById('edit-modal').classList.remove('open');
-}
-
-let editCatSelected = 'main';
-function selectEditCat(cat, el) {
-  editCatSelected = cat;
-  document.querySelectorAll('#edit-cat-row .cat-select-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  const defaultEmojis = { main: '🥩', sub: '🧅', sauce: '🫙' };
-  state.editSelectedEmoji = defaultEmojis[cat];
-  buildEmojiPicker('edit-emoji-picker', state.editSelectedEmoji, cat, 'selectEditEmoji');
-}
-
-
-function toggleEditExpiry() {
-  state.editExpOn = !state.editExpOn;
-  const inp = document.getElementById('edit-expiry');
-  const btn = document.getElementById('edit-exp-toggle');
-  inp.style.display = state.editExpOn ? 'block' : 'none';
-  btn.textContent = state.editExpOn ? '유통기한 입력중' : '+ 유통기한 입력';
-  btn.classList.toggle('on', state.editExpOn);
-}
-
-function saveEditIngredient() {
-  const id = document.getElementById('edit-id').value;
-  const idx = state.ingredients.findIndex(i => i.id === id);
-  if (idx < 0) return;
-  const catBtns = document.querySelectorAll('#edit-cat-row .cat-select-btn.active');
-  const cat = catBtns.length ? catBtns[0].dataset.cat : state.ingredients[idx].cat;
-  state.ingredients[idx] = {
-    ...state.ingredients[idx],
-    name: document.getElementById('edit-name').value.trim() || state.ingredients[idx].name,
-    cat,
-    emoji: state.editSelectedEmoji,
-    unit: document.getElementById('edit-unit').value.trim() || state.ingredients[idx].unit,
-    addDate: document.getElementById('edit-adddate').value,
-    expiry: state.editExpOn ? document.getElementById('edit-expiry').value : '',
-  };
-  saveState();
-  closeEditModal();
-  renderIngredients();
-  showToast('재료가 수정되었습니다');
-}
-
-function deleteIngredientFromEdit() {
-  const id = document.getElementById('edit-id').value;
-  state.ingredients = state.ingredients.filter(i => i.id !== id);
-  saveState();
-  closeEditModal();
-  renderIngredients();
-  showToast('재료를 삭제했습니다');
-}
-
-// ============================================================
-//   RENDER INGREDIENTS
-// ============================================================
+// ═══════════════════════════════════════════
+//  FRIDGE RENDER
+// ═══════════════════════════════════════════
 function renderIngredients() {
-  const cat = state.currentCat;
-  const filtered = cat === 'all'
-    ? state.ingredients
-    : state.ingredients.filter(i => i.cat === cat);
-
-  // Summary (소진된 재료 제외)
-  const active = state.ingredients.filter(i => !i.consumed);
-  const expiring = active.filter(i => {
-    const d = daysUntil(i.expiry);
-    return d !== null && d <= 3;
-  });
-  const checked = active.filter(i => i.checked);
-  const consumed = state.ingredients.filter(i => i.consumed);
-  document.getElementById('sum-total').textContent = active.length;
-  document.getElementById('sum-expiring').textContent = expiring.length;
-  document.getElementById('sum-recipe-check').textContent = checked.length;
-  const consumedEl = document.getElementById('sum-consumed');
-  if (consumedEl) consumedEl.textContent = consumed.length;
-
+  const cat = S.currentCat;
   const list = document.getElementById('ingredient-list');
+
+  const all      = S.ingredients;
+  const active   = all.filter(i => !i.consumed);
+  const expiring = active.filter(i => { const d = daysUntil(i.expiry); return d !== null && d <= 3; });
+  const checked  = active.filter(i => i.checked);
+  const consumed = all.filter(i => i.consumed);
+
+  document.getElementById('sum-total').textContent        = active.length;
+  document.getElementById('sum-expiring').textContent     = expiring.length;
+  document.getElementById('sum-recipe-check').textContent = checked.length;
+  document.getElementById('sum-consumed').textContent     = consumed.length;
+
+  const filtered = cat === 'all' ? all : all.filter(i => i.cat === cat);
+
   if (filtered.length === 0) {
+    const icons = { all:'🧊', main:'🥩', sub:'🧅', sauce:'🫙' };
     list.innerHTML = `<div class="empty-state">
-      <div class="empty-icon float-anim">${cat === 'all' ? '🧊' : cat === 'main' ? '🥩' : cat === 'sub' ? '🧅' : '🫙'}</div>
-      <div class="empty-text">${cat === 'all' ? '냉장고가 비어있어요' : '이 카테고리에 재료가 없어요'}</div>
-      <div class="empty-sub text-muted">+ 버튼으로 재료를 추가해보세요</div>
+      <div class="empty-icon" style="animation:float 3s ease-in-out infinite;">${icons[cat]||'🧊'}</div>
+      <div class="empty-text">${cat==='all' ? '냉장고가 비어있어요' : '이 카테고리에 재료가 없어요'}</div>
+      <div class="empty-sub">+ 버튼으로 재료를 추가해보세요</div>
     </div>`;
     return;
   }
 
   list.innerHTML = filtered.map(ingr => {
     const days = daysUntil(ingr.expiry);
-    let expBadge = '';
-    let cardClass = '';
+    let expBadge = '', borderClass = '';
     if (ingr.expiry) {
-      if (days !== null && days <= 0) {
-        expBadge = `<span class="exp-badge exp-danger">만료됨</span>`;
-        cardClass = 'expiring-soon';
-      } else if (days !== null && days <= 3) {
-        expBadge = `<span class="exp-badge exp-warn">D-${days}</span>`;
-        cardClass = 'expiring-soon';
-      } else if (days !== null) {
-        expBadge = `<span class="exp-badge exp-ok">D-${days}</span>`;
-      }
+      if (days <= 0)      { expBadge = `<span class="exp-badge exp-danger">만료됨</span>`;  borderClass = 'expiring-soon'; }
+      else if (days <= 3) { expBadge = `<span class="exp-badge exp-warn">D-${days}</span>`; borderClass = 'expiring-soon'; }
+      else                { expBadge = `<span class="exp-badge exp-ok">D-${days}</span>`; }
     }
-    const catBadge = {
-      main: '<span class="badge badge-main">메인</span>',
-      sub: '<span class="badge badge-sub">서브</span>',
-      sauce: '<span class="badge badge-sauce">소스</span>',
-    }[ingr.cat] || '';
+    const catBadge = { main:'<span class="badge badge-main">메인</span>', sub:'<span class="badge badge-sub">서브</span>', sauce:'<span class="badge badge-sauce">소스</span>' }[ingr.cat] || '';
+    const consumedClass = ingr.consumed ? 'consumed' : '';
+    const checkedClass  = ingr.checked  ? 'checked-for-recipe' : '';
+    const consumedLabel = ingr.consumed ? '↩ 복구' : '소진';
 
-    return `
-    <div class="ingredient-card ${cardClass} ${ingr.checked ? 'checked-for-recipe' : ''} ${ingr.consumed ? 'consumed' : ''}" id="icard-${ingr.id}">
-      <div class="recipe-check ${ingr.checked ? 'checked' : ''}" onclick="toggleCheck('${ingr.id}')" title="레시피 재료 선택">✓</div>
+    return `<div class="ingredient-card ${borderClass} ${checkedClass} ${consumedClass}" id="icard-${ingr.id}">
+      <button class="recipe-check ${ingr.checked ? 'checked' : ''}" onclick="toggleCheck('${ingr.id}')" title="레시피 재료 선택">✓</button>
       <div class="ingredient-emoji">${ingr.emoji}</div>
-      <div class="ingredient-info" onclick="openEditModal('${ingr.id}')" style="cursor:pointer;">
-        <div class="ingredient-name">${ingr.name}</div>
+      <div class="ingredient-info" onclick="openEditModal('${ingr.id}')">
+        <div class="ingredient-name">${ingr.name}${ingr.unit ? `<span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:4px;">${ingr.unit}</span>` : ''}</div>
         <div class="ingredient-meta">
           ${catBadge}
-          <span class="ingredient-date">입력 ${formatDate(ingr.addDate)}</span>
-          ${ingr.expiry ? `<span class="ingredient-date">/ 만료 ${formatDate(ingr.expiry)}</span>` : ''}
+          <span class="ingredient-date">입력 ${fmt(ingr.addDate)}</span>
+          ${ingr.expiry ? `<span class="ingredient-date">/ 만료 ${fmt(ingr.expiry)}</span>` : ''}
           ${expBadge}
         </div>
       </div>
-      <button class="consumed-btn" onclick="toggleConsumed('${ingr.id}');event.stopPropagation();">
-        ${ingr.consumed ? '✓ 소진됨' : '소진'}
-      </button>
+      <button class="consumed-btn" onclick="toggleConsumed('${ingr.id}');event.stopPropagation();">${consumedLabel}</button>
     </div>`;
   }).join('');
 }
 
 function toggleCheck(id) {
-  const ingr = state.ingredients.find(i => i.id === id);
-  if (ingr) {
-    ingr.checked = !ingr.checked;
-    saveState();
-    renderIngredients();
-  }
+  const i = S.ingredients.find(x => x.id === id);
+  if (!i) return;
+  i.checked = !i.checked;
+  persist();
+  renderIngredients();
 }
 
 function toggleConsumed(id) {
-  const ingr = state.ingredients.find(i => i.id === id);
-  if (!ingr) return;
-  ingr.consumed = !ingr.consumed;
-  saveState();
+  const i = S.ingredients.find(x => x.id === id);
+  if (!i) return;
+  i.consumed = !i.consumed;
+  if (i.consumed) i.checked = false; // 소진되면 레시피 선택 해제
+  persist();
   renderIngredients();
-  showToast(ingr.consumed ? `✓ ${ingr.name} 소진 처리됨` : `↩ ${ingr.name} 복구됨`);
+  toast(i.consumed ? `✓ ${i.name} 소진 처리됨` : `↩ ${i.name} 복구됨`);
 }
 
-// ============================================================
-//   RECIPE PAGE
-// ============================================================
+// 카테고리 탭
+document.getElementById('fridge-cat-tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.cat-tab');
+  if (!btn) return;
+  document.querySelectorAll('#fridge-cat-tabs .cat-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  S.currentCat = btn.dataset.cat;
+  renderIngredients();
+});
+
+// ═══════════════════════════════════════════
+//  ADD MODAL
+// ═══════════════════════════════════════════
+function buildEmojiPicker(containerId, cat, selected, onSelect) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = (EMOJIS[cat] || EMOJIS.main).map(e =>
+    `<div class="emoji-opt${e===selected?' selected':''}" onclick="${onSelect}('${e}',this)">${e}</div>`
+  ).join('');
+}
+
+function openAddModal() {
+  S.addCat = 'main'; S.addEmoji = '🥩'; S.addExpOn = false;
+  document.getElementById('ingr-name').value    = '';
+  document.getElementById('ingr-unit').value    = '';
+  document.getElementById('ingr-adddate').value = today();
+  document.getElementById('ingr-expiry').value  = '';
+  document.getElementById('ingr-expiry').style.display = 'none';
+  document.getElementById('exp-toggle').textContent = '+ 유통기한 입력';
+  document.getElementById('exp-toggle').classList.remove('on');
+  document.querySelectorAll('#add-modal .cat-select-btn').forEach(b => b.classList.toggle('active', b.dataset.cat==='main'));
+  buildEmojiPicker('emoji-picker', 'main', '🥩', 'setAddEmoji');
+  document.getElementById('add-modal').classList.add('open');
+  setTimeout(() => document.getElementById('ingr-name').focus(), 300);
+}
+function closeAddModal() { document.getElementById('add-modal').classList.remove('open'); }
+document.getElementById('add-modal').addEventListener('click', e => { if (e.target === document.getElementById('add-modal')) closeAddModal(); });
+
+function setAddEmoji(e, el) {
+  S.addEmoji = e;
+  document.querySelectorAll('#emoji-picker .emoji-opt').forEach(x => x.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectAddCat(cat, el) {
+  S.addCat = cat;
+  document.querySelectorAll('#add-modal .cat-select-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  S.addEmoji = EMOJIS[cat]?.[0] || '🥩';
+  buildEmojiPicker('emoji-picker', cat, S.addEmoji, 'setAddEmoji');
+}
+function toggleExpiry() {
+  S.addExpOn = !S.addExpOn;
+  document.getElementById('ingr-expiry').style.display = S.addExpOn ? 'block' : 'none';
+  document.getElementById('exp-toggle').textContent = S.addExpOn ? '유통기한 입력중' : '+ 유통기한 입력';
+  document.getElementById('exp-toggle').classList.toggle('on', S.addExpOn);
+  if (S.addExpOn) document.getElementById('ingr-expiry').focus();
+}
+function addIngredient() {
+  const name = document.getElementById('ingr-name').value.trim();
+  if (!name) { toast('재료명을 입력해주세요'); return; }
+  const ingr = {
+    id: Date.now().toString(),
+    name, cat: S.addCat, emoji: S.addEmoji,
+    unit:    document.getElementById('ingr-unit').value.trim(),
+    addDate: document.getElementById('ingr-adddate').value || today(),
+    expiry:  S.addExpOn ? document.getElementById('ingr-expiry').value : '',
+    checked: false, consumed: false,
+  };
+  S.ingredients.push(ingr);
+  persist();
+  closeAddModal();
+  renderIngredients();
+  toast(`${ingr.emoji} ${name} 추가됨`);
+}
+
+// ═══════════════════════════════════════════
+//  EDIT MODAL
+// ═══════════════════════════════════════════
+function openEditModal(id) {
+  const i = S.ingredients.find(x => x.id === id);
+  if (!i) return;
+  S.editCat   = i.cat;
+  S.editEmoji = i.emoji;
+  S.editExpOn = !!i.expiry;
+  document.getElementById('edit-id').value      = id;
+  document.getElementById('edit-name').value    = i.name;
+  document.getElementById('edit-unit').value    = i.unit || '';
+  document.getElementById('edit-adddate').value = i.addDate;
+  document.getElementById('edit-expiry').value  = i.expiry || '';
+  document.getElementById('edit-expiry').style.display = S.editExpOn ? 'block' : 'none';
+  document.getElementById('edit-exp-toggle').textContent = S.editExpOn ? '유통기한 입력중' : '+ 유통기한 입력';
+  document.getElementById('edit-exp-toggle').classList.toggle('on', S.editExpOn);
+  document.querySelectorAll('#edit-cat-row .cat-select-btn').forEach(b => b.classList.toggle('active', b.dataset.cat===i.cat));
+  buildEmojiPicker('edit-emoji-picker', i.cat, i.emoji, 'setEditEmoji');
+  document.getElementById('edit-modal').classList.add('open');
+}
+function closeEditModal() { document.getElementById('edit-modal').classList.remove('open'); }
+document.getElementById('edit-modal').addEventListener('click', e => { if (e.target === document.getElementById('edit-modal')) closeEditModal(); });
+
+function setEditEmoji(e, el) {
+  S.editEmoji = e;
+  document.querySelectorAll('#edit-emoji-picker .emoji-opt').forEach(x => x.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectEditCat(cat, el) {
+  S.editCat = cat;
+  document.querySelectorAll('#edit-cat-row .cat-select-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  S.editEmoji = EMOJIS[cat]?.[0] || '🥩';
+  buildEmojiPicker('edit-emoji-picker', cat, S.editEmoji, 'setEditEmoji');
+}
+function toggleEditExpiry() {
+  S.editExpOn = !S.editExpOn;
+  document.getElementById('edit-expiry').style.display = S.editExpOn ? 'block' : 'none';
+  document.getElementById('edit-exp-toggle').textContent = S.editExpOn ? '유통기한 입력중' : '+ 유통기한 입력';
+  document.getElementById('edit-exp-toggle').classList.toggle('on', S.editExpOn);
+}
+function saveEditIngredient() {
+  const id  = document.getElementById('edit-id').value;
+  const idx = S.ingredients.findIndex(x => x.id === id);
+  if (idx < 0) return;
+  S.ingredients[idx] = {
+    ...S.ingredients[idx],
+    name:    document.getElementById('edit-name').value.trim() || S.ingredients[idx].name,
+    cat:     S.editCat,
+    emoji:   S.editEmoji,
+    unit:    document.getElementById('edit-unit').value.trim(),
+    addDate: document.getElementById('edit-adddate').value,
+    expiry:  S.editExpOn ? document.getElementById('edit-expiry').value : '',
+  };
+  persist(); closeEditModal(); renderIngredients(); toast('재료가 수정되었습니다');
+}
+function deleteIngredientFromEdit() {
+  const id = document.getElementById('edit-id').value;
+  S.ingredients = S.ingredients.filter(x => x.id !== id);
+  persist(); closeEditModal(); renderIngredients(); toast('재료를 삭제했습니다');
+}
+
+// ═══════════════════════════════════════════
+//  RECIPE PAGE
+// ═══════════════════════════════════════════
 function renderRecipePage() {
   renderSelectedChips();
-  // 이미 레시피가 있으면 다시 렌더링
-  if (state.currentRecipes.length > 0) {
-    renderRecipeCards(state.currentRecipes);
-  }
+  if (S.currentRecipes.length > 0) renderRecipeCards(S.currentRecipes);
 }
 
 function renderSelectedChips() {
-  const checked = state.ingredients.filter(i => i.checked);
-  const container = document.getElementById('selected-ingredients-display');
+  const checked = S.ingredients.filter(i => i.checked && !i.consumed);
+  const el = document.getElementById('selected-ingredients-display');
   if (checked.length === 0) {
-    container.innerHTML = `<span class="text-muted" style="font-size:13px;padding:8px 0;">냉장고 탭에서 재료를 선택하거나 아래 옵션을 사용하세요</span>`;
+    el.innerHTML = `<span class="text-muted" style="font-size:13px;padding:8px 0;">냉장고 탭에서 재료를 선택하거나 아래 옵션을 사용하세요</span>`;
     return;
   }
-  container.innerHTML = checked.map(i =>
+  el.innerHTML = checked.map(i =>
     `<span class="sel-chip">${i.emoji} ${i.name}<span class="chip-remove" onclick="uncheckIngr('${i.id}')">×</span></span>`
   ).join('');
 }
 
 function uncheckIngr(id) {
-  const ingr = state.ingredients.find(i => i.id === id);
-  if (ingr) { ingr.checked = false; saveState(); renderSelectedChips(); }
+  const i = S.ingredients.find(x => x.id === id);
+  if (i) { i.checked = false; persist(); renderSelectedChips(); }
 }
 
 function toggleRecipeOption(opt) {
-  state.recipeOptions[opt] = !state.recipeOptions[opt];
-  // 상호 배타: all이면 expiring 해제, vice versa
-  if (opt === 'all' && state.recipeOptions.all) { state.recipeOptions.expiring = false; document.getElementById('opt-expiring').classList.remove('on'); }
-  if (opt === 'expiring' && state.recipeOptions.expiring) { state.recipeOptions.all = false; document.getElementById('opt-all').classList.remove('on'); }
-  document.getElementById('opt-' + opt).classList.toggle('on', state.recipeOptions[opt]);
+  S.recipeOptions[opt] = !S.recipeOptions[opt];
+  if (opt==='all'      && S.recipeOptions.all)      { S.recipeOptions.expiring = false; document.getElementById('opt-expiring').classList.remove('on'); }
+  if (opt==='expiring' && S.recipeOptions.expiring) { S.recipeOptions.all      = false; document.getElementById('opt-all').classList.remove('on'); }
+  document.getElementById('opt-'+opt).classList.toggle('on', S.recipeOptions[opt]);
 }
 
 function setMealType(t) {
-  state.mealType = t;
+  S.mealType = t;
   document.querySelectorAll('[id^="mtype-"]').forEach(b => b.classList.remove('active'));
-  document.getElementById('mtype-' + t).classList.add('active');
+  document.getElementById('mtype-'+t).classList.add('active');
 }
 
 async function generateRecipes() {
-  const provider  = localStorage.getItem('fridge_provider') || state.provider || 'claude';
-  const workerUrl = getWorkerUrl();
+  const workerUrl = S.workerUrl;
+  const provider  = S.provider;
+  const key       = provider === 'gemini' ? S.geminiKey
+                  : provider === 'gpt'    ? S.gptKey
+                  : S.apiKey;
 
-  // Worker가 있으면 키 체크 없이 Worker에 위임
-  if (!workerUrl) {
-    const claudeKey = state.apiKey || localStorage.getItem('fridge_api_key') || '';
-    const geminiKey = state.geminiKey || localStorage.getItem('fridge_gemini_key') || '';
-    const activeKey = provider === 'gemini' ? geminiKey : claudeKey;
-    if (!activeKey) {
-      showToast('⚙️ 설정에서 API 키 또는 Worker URL을 입력해주세요');
-      showPage('settings');
-      return;
-    }
-  }
-
-  // 재료 수집
-  let ingredients = [];
-  if (state.recipeOptions.all) {
-    ingredients = state.ingredients;
-  } else if (state.recipeOptions.expiring) {
-    ingredients = state.ingredients.filter(i => { const d = daysUntil(i.expiry); return d !== null && d <= 5; });
-    if (ingredients.length === 0) ingredients = state.ingredients;
-  } else {
-    ingredients = state.ingredients.filter(i => i.checked);
-  }
-
-  if (ingredients.length === 0 && state.ingredients.length === 0) {
-    showToast('냉장고에 재료를 먼저 추가해주세요');
+  if (!workerUrl && !key) {
+    toast('⚙️ 설정에서 API 키를 입력해주세요');
+    showPage('settings');
     return;
   }
-  if (ingredients.length === 0) ingredients = state.ingredients;
+
+  const active = S.ingredients.filter(i => !i.consumed);
+  let targets = [];
+  if (S.recipeOptions.all)      { targets = active; }
+  else if (S.recipeOptions.expiring) { targets = active.filter(i => { const d=daysUntil(i.expiry); return d!==null&&d<=5; }); if(!targets.length) targets=active; }
+  else { targets = active.filter(i => i.checked); }
+  if (!targets.length) targets = active;
+  if (!targets.length) { toast('냉장고에 재료를 먼저 추가해주세요'); return; }
 
   const results = document.getElementById('recipe-results');
-  const providerLabel = provider === 'gemini' ? '🔵 Gemini' : '🟣 Claude';
-  results.innerHTML = `<div class="ai-loading">
-    <div class="ai-spinner">🤖</div>
-    <div class="ai-loading-text">${providerLabel}가 레시피를 구상 중이에요</div>
-    <div class="ai-loading-sub text-muted">재료를 분석하고 맛있는 레시피를 찾고 있어요...</div>
-  </div>`;
+  results.innerHTML = `<div class="ai-loading"><div class="ai-spinner">🤖</div><div class="ai-loading-text">AI가 레시피를 구상 중이에요</div><div class="text-muted" style="font-size:13px;">재료를 분석하고 있어요...</div></div>`;
 
-  // 프롬프트 조합
-  const ingrList = ingredients.filter(i => !i.consumed).map(i => {
-    const exp = i.expiry ? ` (유통기한: ${i.expiry}${daysUntil(i.expiry) !== null && daysUntil(i.expiry) <= 3 ? ', 임박!' : ''})` : '';
-    return `- ${i.emoji} ${i.name} [${i.cat === 'main' ? '메인재료' : i.cat === 'sub' ? '서브재료' : '소스'}]${exp}`;
+  const mealMap = { all:'제한없음', korean:'한식', western:'양식', quick:'10분 이내 빠른 요리' };
+  const healthy = S.recipeOptions.healthy ? '가능한 건강식 위주로, ' : '';
+  const ingrList = targets.map(i => {
+    const exp = i.expiry ? ` (유통기한:${i.expiry}${daysUntil(i.expiry)<=3?', 임박!':''})` : '';
+    const catLabel = i.cat==='main'?'메인':i.cat==='sub'?'서브':'소스';
+    return `- ${i.emoji} ${i.name}${i.unit?' ('+i.unit+')':''} [${catLabel}]${exp}`;
   }).join('\n');
 
-  const mealTypeMap = { all: '제한없음', korean: '한식', western: '양식', quick: '10분 이내 빠른 요리' };
-  const mealTypeStr = mealTypeMap[state.mealType] || '제한없음';
-  const healthyStr = state.recipeOptions.healthy ? '가능한 건강식 위주로, ' : '';
-
-  const prompt = `당신은 창의적인 요리사입니다. 아래 냉장고 재료를 보고 ${healthyStr}${mealTypeStr} 레시피를 정확히 3개 추천해주세요.
+  const prompt = `당신은 창의적인 요리사입니다. 아래 냉장고 재료로 ${healthy}${mealMap[S.mealType]} 레시피를 정확히 3개 추천해주세요.
 
 냉장고 재료:
 ${ingrList}
 
-반드시 아래 JSON 형식으로만 답해주세요. 마크다운 코드블록 없이 순수 JSON만 출력하세요:
-{
-  "recipes": [
-    {
-      "id": "1",
-      "title": "요리 이름",
-      "emoji": "🍳",
-      "time": "20분",
-      "difficulty": "쉬움",
-      "ingredients_used": ["재료1", "재료2"],
-      "steps": ["1단계 설명", "2단계 설명", "3단계 설명"],
-      "tip": "간단한 요리 팁",
-      "why": "이 레시피를 추천하는 이유 (유통기한 임박 재료 활용 등)"
-    }
-  ]
-}`;
+반드시 아래 JSON 형식으로만 답하세요. 마크다운 코드블록 없이 순수 JSON만 출력:
+{"recipes":[{"id":"1","title":"요리명","emoji":"🍳","time":"20분","difficulty":"쉬움","ingredients_used":["재료1"],"steps":["1단계","2단계","3단계"],"tip":"팁","why":"추천이유"}]}`;
 
   try {
     let text = '';
-
     if (workerUrl) {
-      // ── Worker 경유 (API 키 서버 보관) ──
-      const model = provider === 'gemini'
-        ? (state.geminiModel || localStorage.getItem('fridge_gemini_model') || 'gemini-2.0-flash')
-        : (state.claudeModel || localStorage.getItem('fridge_claude_model') || 'claude-sonnet-4-6');
-      const res = await fetch(`${workerUrl}/api/recipe`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, provider, model }),
-      });
-      if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Worker 오류'); }
-      const data = await res.json();
-      text = data.text || '';
-
+      const model = provider==='gemini' ? S.geminiModel
+                       : provider==='gpt'    ? S.gptModel
+                       : S.claudeModel;
+      const res = await fetch(`${workerUrl}/api/recipe`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({prompt, provider, model}) });
+      if (!res.ok) throw new Error((await res.json()).error || 'Worker 오류');
+      text = (await res.json()).text;
     } else if (provider === 'gemini') {
-      // ── Gemini API ──
-      const model = state.geminiModel || localStorage.getItem('fridge_gemini_model') || 'gemini-2.0-flash';
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${activeKey}`;
-      const res = await fetch(url, {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${S.geminiModel}:generateContent?key=${key}`;
+      const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.7,maxOutputTokens:2000}}) });
+      if (!res.ok) throw new Error((await res.json()).error?.message || 'Gemini 오류');
+      text = (await res.json()).candidates?.[0]?.content?.parts?.[0]?.text || '';
+    } else if (provider === 'gpt') {
+      // ── ChatGPT (OpenAI) ──
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 2000 }
-        })
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+        body: JSON.stringify({ model: S.gptModel, max_tokens: 2000, temperature: 0.7, messages: [{ role: 'user', content: prompt }] })
       });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error?.message || 'Gemini 오류');
-      }
-      const data = await res.json();
-      text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
+      if (!res.ok) throw new Error((await res.json()).error?.message || 'ChatGPT 오류');
+      text = (await res.json()).choices?.[0]?.message?.content || '';
     } else {
-      // ── Claude API ──
-      const model = state.claudeModel || localStorage.getItem('fridge_claude_model') || 'claude-sonnet-4-6';
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': activeKey,
-          'anthropic-version': '2023-06-01'
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 2000,
-          messages: [{ role: 'user', content: prompt }]
-        })
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error?.message || 'Claude 오류');
-      }
-      const data = await res.json();
-      text = data.content?.[0]?.text || '';
+      // ── Claude ──
+      const res = await fetch('https://api.anthropic.com/v1/messages', { method:'POST', headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'}, body: JSON.stringify({model:S.claudeModel, max_tokens:2000, messages:[{role:'user',content:prompt}]}) });
+      if (!res.ok) throw new Error((await res.json()).error?.message || 'Claude 오류');
+      text = (await res.json()).content?.[0]?.text || '';
     }
-
-    // JSON 파싱
-    const clean = text.replace(/```json|```/g, '').trim();
-    let parsed;
-    try { parsed = JSON.parse(clean); }
-    catch(e) { throw new Error('레시피 파싱 실패 — 다시 시도해보세요'); }
-
-    state.currentRecipes = parsed.recipes || [];
-    renderRecipeCards(state.currentRecipes);
-
-  } catch(err) {
-    results.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">😕</div>
-      <div class="empty-text">레시피 추천에 실패했어요</div>
-      <div class="empty-sub text-muted">${err.message}</div>
-      <button class="neu-btn" style="margin-top:16px;" onclick="generateRecipes()">🔄 다시 시도</button>
-    </div>`;
+    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    S.currentRecipes = parsed.recipes || [];
+    renderRecipeCards(S.currentRecipes);
+  } catch(e) {
+    results.innerHTML = `<div class="empty-state"><div class="empty-icon">😕</div><div class="empty-text">레시피 추천 실패</div><div class="empty-sub">${e.message}</div><button class="neu-btn" style="margin-top:16px;" onclick="generateRecipes()">🔄 다시 시도</button></div>`;
   }
 }
 
 function renderRecipeCards(recipes) {
-  const results = document.getElementById('recipe-results');
-  if (!recipes || recipes.length === 0) {
-    results.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div><div class="empty-text">레시피가 없어요</div></div>';
-    return;
-  }
-  results.innerHTML = recipes.map((r, idx) => `
-    <div class="recipe-card" id="rcard-${idx}">
-      <div class="recipe-header">
-        <div class="recipe-title">${r.title}</div>
-        <div class="recipe-title-icon">${r.emoji || '🍳'}</div>
-      </div>
-      <div class="recipe-meta-row">
-        <span class="recipe-meta-tag">⏱ ${r.time || '알 수 없음'}</span>
-        <span class="recipe-meta-tag">📊 ${r.difficulty || '보통'}</span>
-      </div>
+  const el = document.getElementById('recipe-results');
+  if (!recipes?.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div><div class="empty-text">레시피가 없어요</div></div>'; return; }
+  el.innerHTML = recipes.map((r,idx) => `
+    <div class="recipe-card">
+      <div class="recipe-header"><div class="recipe-title">${r.title}</div><div class="recipe-title-icon">${r.emoji||'🍳'}</div></div>
+      <div class="recipe-meta-row"><span class="recipe-meta-tag">⏱ ${r.time||'?'}</span><span class="recipe-meta-tag">📊 ${r.difficulty||'보통'}</span></div>
       ${r.why ? `<div style="font-size:13px;color:var(--accent);margin-bottom:12px;font-weight:500;">💡 ${r.why}</div>` : ''}
-      <div class="recipe-ingredients-used">
-        ${(r.ingredients_used || []).map(i => `<span class="used-chip">${i}</span>`).join('')}
-      </div>
+      <div class="recipe-ingredients-used">${(r.ingredients_used||[]).map(x=>`<span class="used-chip">${x}</span>`).join('')}</div>
       <div class="recipe-steps-preview">
-        ${(r.steps || []).slice(0,2).map((s,i) => `<span style="font-weight:600;color:var(--fg);">${i+1}.</span> ${s}`).join('<br>')}
-        ${(r.steps || []).length > 2 ? `<br><span style="color:var(--accent);cursor:pointer;" onclick="toggleDetail(${idx})">+ ${(r.steps||[]).length - 2}단계 더 보기</span>` : ''}
+        ${(r.steps||[]).slice(0,2).map((s,i)=>`<b>${i+1}.</b> ${s}`).join('<br>')}
+        ${(r.steps||[]).length>2 ? `<br><span style="color:var(--accent);cursor:pointer;" onclick="toggleDetail(${idx})">+ ${(r.steps||[]).length-2}단계 더 보기</span>` : ''}
       </div>
       <div class="recipe-detail" id="rdetail-${idx}">
-        <ol class="step-list">
-          ${(r.steps || []).map((s,i) => `<li class="step-item"><span class="step-num">${i+1}</span><span>${s}</span></li>`).join('')}
-        </ol>
-        ${r.tip ? `<div style="margin-top:12px;padding:12px;border-radius:var(--r-inner);box-shadow:var(--shadow-inset-sm);font-size:13px;"><b>🔑 팁</b> ${r.tip}</div>` : ''}
+        <ol class="step-list">${(r.steps||[]).map((s,i)=>`<li class="step-item"><span class="step-num">${i+1}</span><span>${s}</span></li>`).join('')}</ol>
+        ${r.tip ? `<div style="margin-top:12px;padding:12px;border-radius:var(--r-inner);box-shadow:var(--shadow-inset-sm);font-size:13px;">🔑 ${r.tip}</div>` : ''}
       </div>
       <div class="recipe-actions">
-        <button class="neu-btn" onclick="toggleDetail(${idx})" id="rdetail-btn-${idx}">📋 전체 레시피</button>
+        <button class="neu-btn" id="rdetail-btn-${idx}" onclick="toggleDetail(${idx})">📋 전체 레시피</button>
         <button class="neu-btn neu-btn-accent" onclick="saveRecipe(${idx})">💾 저장</button>
       </div>
-
-      <!-- 리뷰 -->
       <div class="review-section">
         <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;">⭐ 만들어봤다면 평가해주세요</div>
-        <div class="star-row" id="stars-${idx}">
-          ${[1,2,3,4,5].map(s => `<button class="star-btn" onclick="rateStar(${idx}, ${s})">☆</button>`).join('')}
-        </div>
-        <textarea class="review-input" id="review-text-${idx}" placeholder="맛은 어떠셨나요? 나만의 변형 레시피도 공유해보세요 🍴"></textarea>
-        <button class="neu-btn review-submit" onclick="submitReview(${idx})">평가 저장</button>
+        <div class="star-row" id="stars-${idx}">${[1,2,3,4,5].map(s=>`<button class="star-btn" onclick="rateStar(${idx},${s})">☆</button>`).join('')}</div>
+        <textarea class="review-input" id="review-text-${idx}" placeholder="맛은 어떠셨나요? 나만의 변형도 공유해보세요 🍴"></textarea>
+        <button class="neu-btn" style="margin-top:8px;font-size:13px;padding:9px 18px;" onclick="submitReview(${idx})">평가 저장</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function toggleDetail(idx) {
-  const detail = document.getElementById('rdetail-' + idx);
-  const btn = document.getElementById('rdetail-btn-' + idx);
-  const isOpen = detail.classList.toggle('open');
-  btn.textContent = isOpen ? '📋 접기' : '📋 전체 레시피';
+  const d = document.getElementById('rdetail-'+idx);
+  const b = document.getElementById('rdetail-btn-'+idx);
+  const open = d.classList.toggle('open');
+  b.textContent = open ? '📋 접기' : '📋 전체 레시피';
+}
+function rateStar(idx, rating) {
+  document.querySelectorAll(`#stars-${idx} .star-btn`).forEach((s,i) => s.textContent = i<rating ? '⭐':'☆');
+  document.querySelector(`#stars-${idx} .star-btn`).dataset.rating = rating;
+}
+function submitReview(idx) {
+  const rating = parseInt(document.querySelector(`#stars-${idx} .star-btn`).dataset.rating||'0');
+  const text   = document.getElementById('review-text-'+idx).value.trim();
+  if (!rating && !text) { toast('별점이나 리뷰를 입력해주세요'); return; }
+  if (S.currentRecipes[idx]) S.currentRecipes[idx].review = {rating, text, date:today()};
+  toast('평가가 저장되었습니다 ⭐');
+}
+function saveRecipe(idx) {
+  const r = S.currentRecipes[idx];
+  if (!r) return;
+  const entry = {...r, id:Date.now().toString(), savedAt:today(), review:r.review||null};
+  S.savedRecipes.push(entry);
+  persist();
+  toast(`💾 "${r.title}" 저장됨!`);
 }
 
-function rateStar(recipeIdx, rating) {
-  const stars = document.querySelectorAll(`#stars-${recipeIdx} .star-btn`);
-  stars.forEach((s, i) => { s.textContent = i < rating ? '⭐' : '☆'; });
-  stars[0].dataset.rating = rating;
-}
-
-function submitReview(recipeIdx) {
-  const stars = document.querySelectorAll(`#stars-${recipeIdx} .star-btn`);
-  const rating = parseInt(stars[0].dataset.rating || '0');
-  const text = document.getElementById('review-text-' + recipeIdx).value.trim();
-  if (!rating && !text) { showToast('별점이나 리뷰를 입력해주세요'); return; }
-  const recipe = state.currentRecipes[recipeIdx];
-  if (!recipe) return;
-  recipe.review = { rating, text, date: today() };
-  // 저장된 레시피에도 반영
-  const saved = state.savedRecipes.find(r => r.id === recipe._savedId);
-  if (saved) { saved.review = recipe.review; saveState(); }
-  showToast('평가가 저장되었습니다 ⭐');
-}
-
-async function saveRecipe(idx) {
-  const recipe = state.currentRecipes[idx];
-  if (!recipe) return;
-  const id = Date.now().toString();
-  recipe._savedId = id;
-  const entry = { ...recipe, id, savedAt: today(), review: recipe.review || null };
-  state.savedRecipes.push(entry);
-  saveState();
-  await apiSaveRecipe(entry); // Notion 동기 저장 (Worker 있을 때만 실행)
-  showToast(`💾 "${recipe.title}" 저장됨!`);
-}
-
-// ============================================================
-//   SAVED RECIPES
-// ============================================================
+// ═══════════════════════════════════════════
+//  SAVED
+// ═══════════════════════════════════════════
 function renderSaved() {
-  const list = document.getElementById('saved-list');
-  if (state.savedRecipes.length === 0) {
-    list.innerHTML = `<div class="empty-state">
-      <div class="empty-icon float-anim">📚</div>
-      <div class="empty-text">저장된 레시피가 없어요</div>
-      <div class="empty-sub text-muted">레시피 탭에서 마음에 드는 레시피를 저장해보세요</div>
-    </div>`;
+  const el = document.getElementById('saved-list');
+  if (!S.savedRecipes.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon" style="animation:float 3s ease-in-out infinite;">📚</div><div class="empty-text">저장된 레시피가 없어요</div><div class="empty-sub">레시피 탭에서 저장해보세요</div></div>`;
     return;
   }
-  list.innerHTML = [...state.savedRecipes].reverse().map(r => `
+  el.innerHTML = [...S.savedRecipes].reverse().map(r => `
     <div class="saved-recipe-card">
       <div class="saved-header">
-        <div class="saved-title">${r.emoji || '🍳'} ${r.title}</div>
+        <div class="saved-title">${r.emoji||'🍳'} ${r.title}</div>
         <button class="neu-btn" style="padding:6px 12px;font-size:12px;color:var(--danger);" onclick="deleteSaved('${r.id}')">삭제</button>
       </div>
-      <div class="saved-meta">⏱ ${r.time || '-'} · 📊 ${r.difficulty || '-'} · 저장일 ${formatDate(r.savedAt)}</div>
-      ${r.review?.rating ? `<div style="font-size:18px;margin-bottom:4px;">${'⭐'.repeat(r.review.rating)}${'☆'.repeat(5 - r.review.rating)}</div>` : ''}
-      ${r.review?.text ? `<div class="saved-review">"${r.review.text}"</div>` : ''}
-      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6;">
-        ${(r.steps || []).map((s,i) => `<b>${i+1}.</b> ${s}`).join('<br>')}
-      </div>
-      ${r.tip ? `<div style="padding:8px 12px;border-radius:var(--r-inner);box-shadow:var(--shadow-inset-sm);font-size:12px;color:var(--muted);margin-bottom:12px;">🔑 ${r.tip}</div>` : ''}
-      <div style="display:flex;flex-wrap:wrap;gap:6px;">
-        ${(r.ingredients_used || []).map(i => `<span class="used-chip">${i}</span>`).join('')}
-      </div>
-    </div>
-  `).join('');
+      <div class="saved-meta">⏱ ${r.time||'-'} · 📊 ${r.difficulty||'-'} · 저장일 ${fmt(r.savedAt)}</div>
+      ${r.review?.rating ? `<div style="font-size:18px;margin-bottom:4px;">${'⭐'.repeat(r.review.rating)}${'☆'.repeat(5-r.review.rating)}</div>` : ''}
+      ${r.review?.text   ? `<div class="saved-review">"${r.review.text}"</div>` : ''}
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.7;">${(r.steps||[]).map((s,i)=>`<b>${i+1}.</b> ${s}`).join('<br>')}</div>
+      ${r.tip ? `<div style="padding:8px 12px;border-radius:var(--r-inner);box-shadow:var(--shadow-inset-sm);font-size:12px;color:var(--muted);margin-bottom:10px;">🔑 ${r.tip}</div>` : ''}
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">${(r.ingredients_used||[]).map(x=>`<span class="used-chip">${x}</span>`).join('')}</div>
+    </div>`).join('');
 }
-
 function deleteSaved(id) {
   if (!confirm('이 레시피를 삭제할까요?')) return;
-  state.savedRecipes = state.savedRecipes.filter(r => r.id !== id);
-  saveState();
-  renderSaved();
-  showToast('레시피가 삭제되었습니다');
+  S.savedRecipes = S.savedRecipes.filter(r => r.id !== id);
+  persist(); renderSaved(); toast('레시피가 삭제되었습니다');
 }
 
-// ============================================================
-//   SETTINGS - 멀티 프로바이더
-// ============================================================
+// ═══════════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════════
+function syncSettingsUI() {
+  // 제공자
+  document.querySelectorAll('[id^="provider-"]').forEach(b => b.classList.remove('active'));
+  const pb = document.getElementById('provider-'+S.provider);
+  if (pb) pb.classList.add('active');
+  document.getElementById('settings-claude').style.display = S.provider==='claude' ? 'block':'none';
+  document.getElementById('settings-gemini').style.display = S.provider==='gemini' ? 'block':'none';
+  document.getElementById('settings-gpt').style.display    = S.provider==='gpt'    ? 'block':'none';
+  // Claude 모델
+  document.querySelectorAll('[id^="cmodel-"]').forEach(b => b.classList.remove('active'));
+  const cm = {'claude-sonnet-4-6':'cmodel-sonnet','claude-haiku-4-5-20251001':'cmodel-haiku','claude-opus-4-6':'cmodel-opus'}[S.claudeModel];
+  if (cm) document.getElementById(cm)?.classList.add('active');
+  // Gemini 모델
+  document.querySelectorAll('[id^="gmodel-"]').forEach(b => b.classList.remove('active'));
+  const gm = {'gemini-2.0-flash':'gmodel-flash','gemini-2.5-pro':'gmodel-pro'}[S.geminiModel];
+  if (gm) document.getElementById(gm)?.classList.add('active');
+  // GPT 모델 버튼 복원
+  document.querySelectorAll('[id^="gmodel-"]').forEach(b => b.classList.remove('active'));
+  const gpm = {'gpt-4o-mini':'gmodel-4o-mini','gpt-4o':'gmodel-4o','o4-mini':'gmodel-o4-mini'}[S.gptModel];
+  if (gpm) document.getElementById(gpm)?.classList.add('active');
+  // 키 입력란
+  if (S.apiKey)    document.getElementById('claude-key-input').value = S.apiKey;
+  if (S.geminiKey) document.getElementById('gemini-key-input').value = S.geminiKey;
+  if (S.gptKey)    document.getElementById('gpt-key-input').value    = S.gptKey;
+  if (S.workerUrl) document.getElementById('worker-url-input').value = S.workerUrl;
+  updateApiStatus();
+}
 
-// 제공자 선택
-function selectProvider(provider, el) {
-  state.provider = provider;
+function selectProvider(p, el) {
+  S.provider = p;
   document.querySelectorAll('[id^="provider-"]').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('settings-claude').style.display = provider === 'claude' ? 'block' : 'none';
-  document.getElementById('settings-gemini').style.display = provider === 'gemini' ? 'block' : 'none';
+  document.getElementById('settings-claude').style.display = p==='claude' ? 'block':'none';
+  document.getElementById('settings-gemini').style.display = p==='gemini' ? 'block':'none';
+  document.getElementById('settings-gpt').style.display    = p==='gpt'    ? 'block':'none';
 }
+function selectClaudeModel(m, el) { S.claudeModel=m; document.querySelectorAll('[id^="cmodel-"]').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
+function selectGeminiModel(m, el) { S.geminiModel=m; document.querySelectorAll('[id^="gmodel-"]').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
 
-// Claude 모델 선택
-function selectClaudeModel(model, el) {
-  state.claudeModel = model;
-  document.querySelectorAll('[id^="cmodel-"]').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-}
-
-// Gemini 모델 선택
-function selectGeminiModel(model, el) {
-  state.geminiModel = model;
-  document.querySelectorAll('[id^="gmodel-"]').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-}
+function selectGptModel(m, el) { S.gptModel=m; document.querySelectorAll('[id^="gmodel-"]').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
 
 function saveApiKey() {
-  const provider = state.provider || 'claude';
-  if (provider === 'claude') {
-    const key = document.getElementById('claude-key-input').value.trim();
-    if (!key) { showToast('API 키를 입력해주세요'); return; }
-    state.apiKey = key;
-    localStorage.setItem('fridge_api_key', key);
-    localStorage.setItem('fridge_provider', 'claude');
-    localStorage.setItem('fridge_claude_model', state.claudeModel || 'claude-sonnet-4-6');
+  if (S.provider==='claude') {
+    const k = document.getElementById('claude-key-input').value.trim();
+    if (!k) { toast('API 키를 입력해주세요'); return; }
+    S.apiKey = k;
+    localStorage.setItem('fridge_api_key',      k);
+    localStorage.setItem('fridge_provider',      'claude');
+    localStorage.setItem('fridge_claude_model',  S.claudeModel);
+  } else if (S.provider === 'gpt') {
+    const k = document.getElementById('gpt-key-input').value.trim();
+    if (!k) { toast('API 키를 입력해주세요'); return; }
+    S.gptKey = k;
+    localStorage.setItem('fridge_gpt_key',   k);
+    localStorage.setItem('fridge_provider',  'gpt');
+    localStorage.setItem('fridge_gpt_model', S.gptModel);
   } else {
-    const key = document.getElementById('gemini-key-input').value.trim();
-    if (!key) { showToast('API 키를 입력해주세요'); return; }
-    state.geminiKey = key;
-    localStorage.setItem('fridge_gemini_key', key);
-    localStorage.setItem('fridge_provider', 'gemini');
-    localStorage.setItem('fridge_gemini_model', state.geminiModel || 'gemini-2.0-flash');
+    const k = document.getElementById('gemini-key-input').value.trim();
+    if (!k) { toast('API 키를 입력해주세요'); return; }
+    S.geminiKey = k;
+    localStorage.setItem('fridge_gemini_key',   k);
+    localStorage.setItem('fridge_provider',     'gemini');
+    localStorage.setItem('fridge_gemini_model', S.geminiModel);
   }
   updateApiStatus();
-  showToast('✓ 저장되었습니다');
+  toast('✓ 저장되었습니다');
 }
 
 function updateApiStatus() {
-  const provider = localStorage.getItem('fridge_provider');
-  const claudeKey = localStorage.getItem('fridge_api_key');
-  const geminiKey = localStorage.getItem('fridge_gemini_key');
-  const workerUrl = localStorage.getItem('fridge_worker_url');
   const el = document.getElementById('api-status-inner');
   if (!el) return;
-
-  if (workerUrl) {
-    el.innerHTML = `<div style="font-size:22px;">☁️</div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent-teal);">Worker 모드</div>
-        <div style="font-size:11px;color:var(--muted);">API 키가 서버에서 관리됩니다</div>
-      </div>`;
-  } else if (provider === 'claude' && claudeKey) {
-    const model = localStorage.getItem('fridge_claude_model') || 'claude-sonnet-4-6';
-    el.innerHTML = `<div style="font-size:22px;">🟣</div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent);">Claude 연결됨</div>
-        <div style="font-size:11px;color:var(--muted);">${model} · ...${claudeKey.slice(-4)}</div>
-      </div>`;
-  } else if (provider === 'gemini' && geminiKey) {
-    const model = localStorage.getItem('fridge_gemini_model') || 'gemini-2.0-flash';
-    el.innerHTML = `<div style="font-size:22px;">🔵</div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#1a73e8;">Gemini 연결됨</div>
-        <div style="font-size:11px;color:var(--muted);">${model} · ...${geminiKey.slice(-4)}</div>
-      </div>`;
+  if (S.workerUrl) {
+    el.innerHTML = `<div style="font-size:22px;">☁️</div><div><div style="font-size:13px;font-weight:700;color:var(--accent-teal);">Worker 모드</div><div style="font-size:11px;color:var(--muted);">API 키가 서버에서 관리됩니다</div></div>`;
+  } else if (S.provider==='claude' && S.apiKey) {
+    el.innerHTML = `<div style="font-size:22px;">🟣</div><div><div style="font-size:13px;font-weight:700;color:var(--accent);">Claude 연결됨</div><div style="font-size:11px;color:var(--muted);">${S.claudeModel} · ...${S.apiKey.slice(-4)}</div></div>`;
+  } else if (S.provider==='gemini' && S.geminiKey) {
+    el.innerHTML = `<div style="font-size:22px;">🔵</div><div><div style="font-size:13px;font-weight:700;color:#1a73e8;">Gemini 연결됨</div><div style="font-size:11px;color:var(--muted);">${S.geminiModel} · ...${S.geminiKey.slice(-4)}</div></div>`;
+  } else if (S.provider==='gpt' && S.gptKey) {
+    el.innerHTML = `<div style="font-size:22px;">🟢</div><div><div style="font-size:13px;font-weight:700;color:#10a37f;">ChatGPT 연결됨</div><div style="font-size:11px;color:var(--muted);">${S.gptModel} · ...${S.gptKey.slice(-4)}</div></div>`;
   } else {
-    el.innerHTML = `<div style="font-size:22px;">⚪</div>
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--muted);">API 키 미설정</div>
-        <div style="font-size:11px;color:var(--muted);">위에서 키를 입력하고 저장하세요</div>
-      </div>`;
+    el.innerHTML = `<div style="font-size:22px;">⚪</div><div><div style="font-size:13px;font-weight:600;color:var(--muted);">API 키 미설정</div><div style="font-size:11px;color:var(--muted);">위에서 키를 입력하고 저장하세요</div></div>`;
   }
 }
 
-// ============================================================
-//   WORKER URL 설정
-// ============================================================
-function saveWorkerUrl() {
-  const url = document.getElementById('worker-url-input').value.trim().replace(/\/$/, '');
-  if (!url) { showToast('Worker URL을 입력해주세요'); return; }
-  if (!url.startsWith('https://')) { showToast('https:// 로 시작해야 합니다'); return; }
-  state.workerUrl = url;
-  localStorage.setItem('fridge_worker_url', url);
-  updateApiStatus();
-  showToast('☁️ Worker URL이 저장되었습니다');
-}
-
-async function testWorker() {
-  const url = document.getElementById('worker-url-input').value.trim().replace(/\/$/, '')
-    || localStorage.getItem('fridge_worker_url') || '';
-  if (!url) { showToast('Worker URL을 먼저 입력해주세요'); return; }
-
-  const statusEl = document.getElementById('worker-status');
-  const iconEl   = document.getElementById('worker-status-icon');
-  const textEl   = document.getElementById('worker-status-text');
-  const subEl    = document.getElementById('worker-status-sub');
-  statusEl.style.display = 'block';
-  iconEl.textContent = '⏳'; textEl.textContent = '연결 확인 중...'; subEl.textContent = '';
-
-  try {
-    const res = await fetch(`${url}/api/health`, { signal: AbortSignal.timeout(8000) });
-    const data = await res.json();
-    if (data.ok) {
-      const services = data.services || {};
-      iconEl.textContent = '✅';
-      textEl.textContent = 'Worker 연결 성공!';
-      textEl.style.color = 'var(--accent-teal)';
-      subEl.textContent = [
-        services.claude  ? '🟣 Claude' : '🟣 Claude ✗',
-        services.gemini  ? '🔵 Gemini' : '🔵 Gemini ✗',
-        services.notion  ? '📝 Notion' : '📝 Notion ✗',
-      ].join('  ');
-    } else { throw new Error('health check 실패'); }
-  } catch(e) {
-    iconEl.textContent = '❌';
-    textEl.textContent = '연결 실패';
-    textEl.style.color = 'var(--danger)';
-    subEl.textContent = e.message;
-  }
-}
-
-// ============================================================
-//   저장소 선택 (local / notion)
-// ============================================================
-function selectStorage(type, el) {
-  state.storageType = type;
-  localStorage.setItem('fridge_storage', type);
-  document.querySelectorAll('[id^="storage-"]').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  const notice = document.getElementById('storage-notice');
-  if (type === 'notion') {
-    const workerUrl = localStorage.getItem('fridge_worker_url');
-    if (!workerUrl) {
-      notice.textContent = '⚠️ Notion 저장은 Worker URL 설정이 필요합니다.';
-      notice.style.color = 'var(--danger)';
-      state.storageType = 'local';
-      localStorage.setItem('fridge_storage', 'local');
-      document.getElementById('storage-local').classList.add('active');
-      el.classList.remove('active');
-    } else {
-      notice.textContent = '📝 재료와 레시피가 Notion DB에 저장됩니다.';
-      notice.style.color = 'var(--accent-teal)';
-    }
-  } else {
-    notice.textContent = '📱 현재: 이 기기 브라우저에만 저장됩니다.';
-    notice.style.color = 'var(--muted)';
-  }
-}
-
-// ============================================================
-//   API 레이어 - Worker 우선, 없으면 직접 호출
-// ============================================================
-function getWorkerUrl() {
-  return state.workerUrl || localStorage.getItem('fridge_worker_url') || '';
-}
-
-function useWorker() {
-  return !!getWorkerUrl();
-}
-
-// 재료 저장
-async function apiSaveIngredient(ingr) {
-  if (!useWorker() || state.storageType !== 'notion') return; // local만이면 skip
-  try {
-    const res = await fetch(`${getWorkerUrl()}/api/ingredients`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(ingr),
-    });
-    const data = await res.json();
-    if (data.ingredient?.id) ingr.notionId = data.ingredient.id; // Notion page ID 저장
-  } catch(e) { console.warn('Notion 재료 저장 실패 (로컬 유지):', e.message); }
-}
-
-// 재료 수정
-async function apiUpdateIngredient(ingr) {
-  if (!useWorker() || state.storageType !== 'notion' || !ingr.notionId) return;
-  try {
-    await fetch(`${getWorkerUrl()}/api/ingredients/${ingr.notionId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(ingr),
-    });
-  } catch(e) { console.warn('Notion 재료 수정 실패:', e.message); }
-}
-
-// 재료 삭제
-async function apiDeleteIngredient(notionId) {
-  if (!useWorker() || state.storageType !== 'notion' || !notionId) return;
-  try {
-    await fetch(`${getWorkerUrl()}/api/ingredients/${notionId}`, { method: 'DELETE' });
-  } catch(e) { console.warn('Notion 재료 삭제 실패:', e.message); }
-}
-
-// 레시피 저장
-async function apiSaveRecipe(recipe) {
-  if (!useWorker() || state.storageType !== 'notion') return;
-  try {
-    const provider = localStorage.getItem('fridge_provider') || 'claude';
-    const res = await fetch(`${getWorkerUrl()}/api/saved-recipes`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...recipe, provider }),
-    });
-    const data = await res.json();
-    if (data.recipe?.id) recipe.notionId = data.recipe.id;
-  } catch(e) { console.warn('Notion 레시피 저장 실패 (로컬 유지):', e.message); }
-}
-
-// 레시피 리뷰 업데이트
-async function apiUpdateRecipe(recipe) {
-  if (!useWorker() || state.storageType !== 'notion' || !recipe.notionId) return;
-  try {
-    await fetch(`${getWorkerUrl()}/api/saved-recipes/${recipe.notionId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(recipe),
-    });
-  } catch(e) { console.warn('Notion 레시피 업데이트 실패:', e.message); }
-}
-
-function clearAllData() {
-  if (!confirm('전체 데이터를 초기화할까요? 이 작업은 되돌릴 수 없습니다.')) return;
-  state.ingredients = [];
-  state.savedRecipes = [];
-  state.currentRecipes = [];
-  saveState();
-  renderIngredients();
-  showToast('데이터가 초기화되었습니다');
-}
-
-// ============================================================
-//   TOAST
-// ============================================================
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ============================================================
-//   INIT
-// ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-  try { loadState(); } catch(e) { console.warn('loadState 오류:', e); }
-  try { renderIngredients(); } catch(e) { console.warn('renderIngredients 오류:', e); }
-
-  // 카테고리 탭 이벤트 (DOMContentLoaded 후 붙여야 안전)
-  document.querySelectorAll('#fridge-cat-tabs .cat-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('#fridge-cat-tabs .cat-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      state.currentCat = btn.dataset.cat;
-      renderIngredients();
-    });
-  });
-
-  // PWA Service Worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-  }
-});
-</script>
-</body>
-</html>
+function sav
