@@ -1,0 +1,20 @@
+name = "fridge-worker"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# 환경변수는 wrangler secret put 으로 별도 설정 (절대 여기 적지 마세요!)
+# 아래는 구조 확인용 주석입니다.
+#
+# [vars]
+# ALLOWED_ORIGIN = "https://hyunra94.github.io"   ← 비밀 아닌 값은 여기 적어도 됨
+#
+# secrets (wrangler secret put 으로 설정):
+#   CLAUDE_API_KEY
+#   GEMINI_API_KEY
+#   OPENAI_API_KEY
+#   NOTION_TOKEN
+#   NOTION_INGREDIENT_DB
+#   NOTION_RECIPE_DB
+
+[vars]
+ALLOWED_ORIGIN = "https://hyunra94.github.io"
