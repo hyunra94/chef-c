@@ -405,43 +405,42 @@
     .exp-ok { background: rgba(56,178,172,0.12); color: var(--accent-teal); }
     .exp-warn { background: rgba(255,165,0,0.15); color: #C07A00; }
     .exp-danger { background: rgba(224,92,92,0.12); color: var(--danger); }
-    .qty-control {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    /* 소진 버튼 */
+    .consumed-btn {
       flex-shrink: 0;
-    }
-    .qty-btn {
-      width: 30px;
-      height: 30px;
+      padding: 6px 12px;
       border-radius: 10px;
       background: var(--bg);
       box-shadow: var(--shadow-extruded-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
+      font-size: 11px;
       font-weight: 700;
-      color: var(--accent);
-      transition: all var(--transition);
+      color: var(--muted);
       cursor: pointer;
       border: none;
-      line-height: 1;
+      transition: all var(--transition);
+      white-space: nowrap;
     }
-    .qty-btn:hover {
+    .consumed-btn:hover {
+      color: var(--danger);
       box-shadow: var(--shadow-extruded);
       transform: translateY(-1px);
     }
-    .qty-btn:active {
+    .consumed-btn:active {
       box-shadow: var(--shadow-inset-sm);
       transform: translateY(0.5px);
     }
-    .qty-btn.minus { color: var(--danger); }
-    .qty-num {
-      font-weight: 700;
-      font-size: 15px;
-      min-width: 20px;
-      text-align: center;
+    /* 소진된 재료 카드 */
+    .ingredient-card.consumed {
+      opacity: 0.45;
+      box-shadow: var(--shadow-inset-sm);
+    }
+    .ingredient-card.consumed .ingredient-name {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+    .ingredient-card.consumed .consumed-btn {
+      color: var(--accent-teal);
+      box-shadow: var(--shadow-inset-sm);
     }
     .del-btn {
       width: 28px;
@@ -1079,6 +1078,11 @@
         <div class="summary-num text-teal" id="sum-recipe-check">0</div>
         <div class="summary-label">레시피 선택</div>
       </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <div class="summary-num" id="sum-consumed" style="color:var(--muted);">0</div>
+        <div class="summary-label">소진됨</div>
+      </div>
     </div>
 
     <!-- 카테고리 탭 -->
@@ -1214,7 +1218,7 @@
       <button class="neu-btn neu-btn-accent" style="width:100%;padding:12px;" onclick="saveApiKey()">저장</button>
     </div>
 
-    <!-- 현재 상태 표시 -->
+    <!-- 현재 AI 상태 표시 -->
     <div class="settings-card" id="api-status-card" style="padding:16px 24px;">
       <div id="api-status-inner" style="display:flex;align-items:center;gap:10px;">
         <div style="font-size:22px;">⚪</div>
@@ -1222,6 +1226,57 @@
           <div style="font-size:13px;font-weight:600;color:var(--muted);">API 키 미설정</div>
           <div style="font-size:11px;color:var(--muted);">위에서 키를 입력하고 저장하세요</div>
         </div>
+      </div>
+    </div>
+
+    <!-- Cloudflare Worker 설정 -->
+    <div class="settings-card">
+      <div class="settings-title">☁️ Cloudflare Worker</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6;">
+        Worker URL을 설정하면 API 키를 브라우저에 저장하지 않아도 됩니다.<br>
+        재료·레시피도 Notion DB에 자동으로 저장됩니다.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Worker URL</label>
+        <input type="url" class="neu-input" id="worker-url-input"
+          placeholder="https://fridge-worker.[id].workers.dev" />
+        <div class="save-notice">* Worker 배포 후 발급되는 URL</div>
+      </div>
+      <button class="neu-btn" style="width:100%;padding:11px;margin-bottom:10px;" onclick="testWorker()">
+        🔍 연결 테스트
+      </button>
+      <button class="neu-btn neu-btn-accent" style="width:100%;padding:12px;" onclick="saveWorkerUrl()">
+        저장
+      </button>
+      <!-- Worker 상태 뱃지 -->
+      <div id="worker-status" style="margin-top:12px;display:none;">
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--r-inner);box-shadow:var(--shadow-inset-sm);">
+          <span id="worker-status-icon" style="font-size:18px;">⚪</span>
+          <div>
+            <div id="worker-status-text" style="font-size:13px;font-weight:600;"></div>
+            <div id="worker-status-sub" style="font-size:11px;color:var(--muted);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 데이터 저장소 선택 -->
+    <div class="settings-card">
+      <div class="settings-title">💾 데이터 저장소</div>
+      <div class="cat-select-row">
+        <button class="cat-select-btn active" id="storage-local" onclick="selectStorage('local', this)" style="padding:12px 8px;">
+          <div style="font-size:20px;margin-bottom:4px;">📱</div>
+          <div style="font-weight:700;font-size:12px;">로컬</div>
+          <div style="font-size:10px;color:var(--muted);">이 기기에만</div>
+        </button>
+        <button class="cat-select-btn" id="storage-notion" onclick="selectStorage('notion', this)" style="padding:12px 8px;">
+          <div style="font-size:20px;margin-bottom:4px;">📝</div>
+          <div style="font-weight:700;font-size:12px;">Notion</div>
+          <div style="font-size:10px;color:var(--muted);">Worker 필요</div>
+        </button>
+      </div>
+      <div id="storage-notice" style="margin-top:10px;font-size:12px;color:var(--muted);padding:10px 12px;border-radius:var(--r-inner);box-shadow:var(--shadow-inset-sm);">
+        📱 현재: 이 기기 브라우저에만 저장됩니다.
       </div>
     </div>
 
@@ -1233,7 +1288,7 @@
     <div class="settings-card" style="text-align:center;">
       <div style="font-size:32px;margin-bottom:8px;">🧊</div>
       <div class="font-display" style="font-weight:700;font-size:16px;margin-bottom:4px;">냉장고를 부탁해</div>
-      <div class="text-muted" style="font-size:12px;">v1.1.0 · Claude & Gemini 지원</div>
+      <div class="text-muted" style="font-size:12px;">v1.2.0 · Worker + Notion 지원</div>
     </div>
   </div>
 
@@ -1296,15 +1351,10 @@
       <input type="text" class="neu-input" id="ingr-name" placeholder="예: 두부, 간장, 파 ..." />
     </div>
 
-    <!-- 수량 -->
+    <!-- 단위 -->
     <div class="form-group">
-      <label class="form-label">수량</label>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <button class="qty-btn minus" onclick="changeModalQty(-1)">−</button>
-        <span class="qty-num" id="modal-qty" style="font-size:18px;min-width:30px;text-align:center;">1</span>
-        <button class="qty-btn" onclick="changeModalQty(1)">+</button>
-        <input type="text" class="neu-input" id="ingr-unit" placeholder="개 / g / ml" style="flex:1;" />
-      </div>
+      <label class="form-label">단위 <span style="font-weight:400;color:var(--muted);font-size:11px;">(선택)</span></label>
+      <input type="text" class="neu-input" id="ingr-unit" placeholder="개 / 묶음 / 병 / kg ..." />
     </div>
 
     <!-- 입력일 (자동) -->
@@ -1358,13 +1408,8 @@
     </div>
 
     <div class="form-group">
-      <label class="form-label">수량</label>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <button class="qty-btn minus" onclick="changeEditQty(-1)">−</button>
-        <span class="qty-num" id="edit-qty" style="font-size:18px;min-width:30px;text-align:center;">1</span>
-        <button class="qty-btn" onclick="changeEditQty(1)">+</button>
-        <input type="text" class="neu-input" id="edit-unit" style="flex:1;" />
-      </div>
+      <label class="form-label">단위 <span style="font-weight:400;color:var(--muted);font-size:11px;">(선택)</span></label>
+      <input type="text" class="neu-input" id="edit-unit" placeholder="개 / 묶음 / 병 / kg ..." />
     </div>
 
     <div class="form-group">
@@ -1400,8 +1445,6 @@ let state = {
   claudeModel: 'claude-sonnet-4-6',
   geminiModel: 'gemini-2.0-flash',
   currentCat: 'all',
-  modalQty: 1,
-  editQty: 1,
   selectedEmoji: '🥩',
   editSelectedEmoji: '🥩',
   editExpOn: true,
@@ -1456,6 +1499,27 @@ function loadState() {
       const modelMap = { 'gemini-2.0-flash': 'gmodel-flash', 'gemini-2.5-pro': 'gmodel-pro' };
       const btnId = modelMap[geminiModel];
       if (btnId) { document.querySelectorAll('[id^="gmodel-"]').forEach(b => b.classList.remove('active')); document.getElementById(btnId)?.classList.add('active'); }
+    }
+
+    // Worker URL + 저장소 타입 복원
+    const workerUrl = localStorage.getItem('fridge_worker_url');
+    if (workerUrl) {
+      state.workerUrl = workerUrl;
+      const inp = document.getElementById('worker-url-input');
+      if (inp) inp.value = workerUrl;
+    }
+    const storageType = localStorage.getItem('fridge_storage') || 'local';
+    state.storageType = storageType;
+    const storageBtn = document.getElementById('storage-' + storageType);
+    if (storageBtn) {
+      document.querySelectorAll('[id^="storage-"]').forEach(b => b.classList.remove('active'));
+      storageBtn.classList.add('active');
+      const notice = document.getElementById('storage-notice');
+      if (notice) {
+        notice.textContent = storageType === 'notion'
+          ? '📝 재료와 레시피가 Notion DB에 저장됩니다.'
+          : '📱 현재: 이 기기 브라우저에만 저장됩니다.';
+      }
     }
 
     updateApiStatus();
@@ -1534,7 +1598,6 @@ let addCatSelected = 'main';
 
 function openAddModal() {
   addCatSelected = 'main';
-  state.modalQty = 1;
   state.selectedEmoji = '🥩';
   state.addExpOn = false;
   document.getElementById('ingr-name').value = '';
@@ -1544,7 +1607,6 @@ function openAddModal() {
   document.getElementById('ingr-expiry').style.display = 'none';
   document.getElementById('exp-toggle').textContent = '+ 유통기한 입력';
   document.getElementById('exp-toggle').classList.remove('on');
-  document.getElementById('modal-qty').textContent = '1';
   // Reset cat buttons
   document.querySelectorAll('#add-modal .cat-select-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.cat === 'main');
@@ -1572,10 +1634,6 @@ function selectCat(cat, el) {
   buildEmojiPicker('emoji-picker', state.selectedEmoji, cat, 'selectEmoji');
 }
 
-function changeModalQty(delta) {
-  state.modalQty = Math.max(1, state.modalQty + delta);
-  document.getElementById('modal-qty').textContent = state.modalQty;
-}
 
 function toggleExpiry() {
   state.addExpOn = !state.addExpOn;
@@ -1587,7 +1645,7 @@ function toggleExpiry() {
   if (state.addExpOn) inp.focus();
 }
 
-function addIngredient() {
+async function addIngredient() {
   const name = document.getElementById('ingr-name').value.trim();
   if (!name) { showToast('재료명을 입력해주세요'); return; }
   const id = Date.now().toString();
@@ -1596,7 +1654,6 @@ function addIngredient() {
     name,
     cat: addCatSelected,
     emoji: state.selectedEmoji,
-    qty: state.modalQty,
     unit: document.getElementById('ingr-unit').value.trim() || '개',
     addDate: document.getElementById('ingr-adddate').value || today(),
     expiry: state.addExpOn ? document.getElementById('ingr-expiry').value : '',
@@ -1606,6 +1663,7 @@ function addIngredient() {
   saveState();
   closeAddModal();
   renderIngredients();
+  await apiSaveIngredient(ingr); // Notion 저장 (Worker 있을 때만)
   showToast(`${ingr.emoji} ${name} 추가됨`);
 }
 
@@ -1620,8 +1678,6 @@ function openEditModal(id) {
   document.getElementById('edit-unit').value = ingr.unit;
   document.getElementById('edit-adddate').value = ingr.addDate;
   document.getElementById('edit-expiry').value = ingr.expiry || '';
-  state.editQty = ingr.qty;
-  document.getElementById('edit-qty').textContent = ingr.qty;
   state.editSelectedEmoji = ingr.emoji;
   state.editExpOn = !!ingr.expiry;
   const expInp = document.getElementById('edit-expiry');
@@ -1654,10 +1710,6 @@ function selectEditCat(cat, el) {
   buildEmojiPicker('edit-emoji-picker', state.editSelectedEmoji, cat, 'selectEditEmoji');
 }
 
-function changeEditQty(delta) {
-  state.editQty = Math.max(1, state.editQty + delta);
-  document.getElementById('edit-qty').textContent = state.editQty;
-}
 
 function toggleEditExpiry() {
   state.editExpOn = !state.editExpOn;
@@ -1679,7 +1731,6 @@ function saveEditIngredient() {
     name: document.getElementById('edit-name').value.trim() || state.ingredients[idx].name,
     cat,
     emoji: state.editSelectedEmoji,
-    qty: state.editQty,
     unit: document.getElementById('edit-unit').value.trim() || state.ingredients[idx].unit,
     addDate: document.getElementById('edit-adddate').value,
     expiry: state.editExpOn ? document.getElementById('edit-expiry').value : '',
@@ -1708,15 +1759,19 @@ function renderIngredients() {
     ? state.ingredients
     : state.ingredients.filter(i => i.cat === cat);
 
-  // Summary
-  const expiring = state.ingredients.filter(i => {
+  // Summary (소진된 재료 제외)
+  const active = state.ingredients.filter(i => !i.consumed);
+  const expiring = active.filter(i => {
     const d = daysUntil(i.expiry);
     return d !== null && d <= 3;
   });
-  const checked = state.ingredients.filter(i => i.checked);
-  document.getElementById('sum-total').textContent = state.ingredients.length;
+  const checked = active.filter(i => i.checked);
+  const consumed = state.ingredients.filter(i => i.consumed);
+  document.getElementById('sum-total').textContent = active.length;
   document.getElementById('sum-expiring').textContent = expiring.length;
   document.getElementById('sum-recipe-check').textContent = checked.length;
+  const consumedEl = document.getElementById('sum-consumed');
+  if (consumedEl) consumedEl.textContent = consumed.length;
 
   const list = document.getElementById('ingredient-list');
   if (filtered.length === 0) {
@@ -1750,7 +1805,7 @@ function renderIngredients() {
     }[ingr.cat] || '';
 
     return `
-    <div class="ingredient-card ${cardClass} ${ingr.checked ? 'checked-for-recipe' : ''}" id="icard-${ingr.id}">
+    <div class="ingredient-card ${cardClass} ${ingr.checked ? 'checked-for-recipe' : ''} ${ingr.consumed ? 'consumed' : ''}" id="icard-${ingr.id}">
       <div class="recipe-check ${ingr.checked ? 'checked' : ''}" onclick="toggleCheck('${ingr.id}')" title="레시피 재료 선택">✓</div>
       <div class="ingredient-emoji">${ingr.emoji}</div>
       <div class="ingredient-info" onclick="openEditModal('${ingr.id}')" style="cursor:pointer;">
@@ -1762,11 +1817,9 @@ function renderIngredients() {
           ${expBadge}
         </div>
       </div>
-      <div class="qty-control">
-        <button class="qty-btn minus" onclick="changeQty('${ingr.id}', -1)">−</button>
-        <span class="qty-num">${ingr.qty}<span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:2px;">${ingr.unit}</span></span>
-        <button class="qty-btn" onclick="changeQty('${ingr.id}', 1)">+</button>
-      </div>
+      <button class="consumed-btn" onclick="toggleConsumed('${ingr.id}');event.stopPropagation();">
+        ${ingr.consumed ? '✓ 소진됨' : '소진'}
+      </button>
     </div>`;
   }).join('');
 }
@@ -1780,30 +1833,14 @@ function toggleCheck(id) {
   }
 }
 
-function changeQty(id, delta) {
+function toggleConsumed(id) {
   const ingr = state.ingredients.find(i => i.id === id);
-  if (ingr) {
-    ingr.qty = Math.max(0, ingr.qty + delta);
-    if (ingr.qty === 0) {
-      if (confirm(`${ingr.name}을(를) 삭제할까요?`)) {
-        state.ingredients = state.ingredients.filter(i => i.id !== id);
-        showToast(`${ingr.name} 삭제됨`);
-      } else { ingr.qty = 1; }
-    }
-    saveState();
-    renderIngredients();
-  }
+  if (!ingr) return;
+  ingr.consumed = !ingr.consumed;
+  saveState();
+  renderIngredients();
+  showToast(ingr.consumed ? `✓ ${ingr.name} 소진 처리됨` : `↩ ${ingr.name} 복구됨`);
 }
-
-// Category tab logic
-document.querySelectorAll('#fridge-cat-tabs .cat-tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#fridge-cat-tabs .cat-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    state.currentCat = btn.dataset.cat;
-    renderIngredients();
-  });
-});
 
 // ============================================================
 //   RECIPE PAGE
@@ -1848,15 +1885,19 @@ function setMealType(t) {
 }
 
 async function generateRecipes() {
-  const provider = localStorage.getItem('fridge_provider') || state.provider || 'claude';
-  const claudeKey = state.apiKey || localStorage.getItem('fridge_api_key') || '';
-  const geminiKey = state.geminiKey || localStorage.getItem('fridge_gemini_key') || '';
-  const activeKey = provider === 'gemini' ? geminiKey : claudeKey;
+  const provider  = localStorage.getItem('fridge_provider') || state.provider || 'claude';
+  const workerUrl = getWorkerUrl();
 
-  if (!activeKey) {
-    showToast('⚙️ 설정에서 API 키를 입력해주세요');
-    showPage('settings');
-    return;
+  // Worker가 있으면 키 체크 없이 Worker에 위임
+  if (!workerUrl) {
+    const claudeKey = state.apiKey || localStorage.getItem('fridge_api_key') || '';
+    const geminiKey = state.geminiKey || localStorage.getItem('fridge_gemini_key') || '';
+    const activeKey = provider === 'gemini' ? geminiKey : claudeKey;
+    if (!activeKey) {
+      showToast('⚙️ 설정에서 API 키 또는 Worker URL을 입력해주세요');
+      showPage('settings');
+      return;
+    }
   }
 
   // 재료 수집
@@ -1885,9 +1926,9 @@ async function generateRecipes() {
   </div>`;
 
   // 프롬프트 조합
-  const ingrList = ingredients.map(i => {
+  const ingrList = ingredients.filter(i => !i.consumed).map(i => {
     const exp = i.expiry ? ` (유통기한: ${i.expiry}${daysUntil(i.expiry) !== null && daysUntil(i.expiry) <= 3 ? ', 임박!' : ''})` : '';
-    return `- ${i.emoji} ${i.name} ${i.qty}${i.unit} [${i.cat === 'main' ? '메인재료' : i.cat === 'sub' ? '서브재료' : '소스'}]${exp}`;
+    return `- ${i.emoji} ${i.name} [${i.cat === 'main' ? '메인재료' : i.cat === 'sub' ? '서브재료' : '소스'}]${exp}`;
   }).join('\n');
 
   const mealTypeMap = { all: '제한없음', korean: '한식', western: '양식', quick: '10분 이내 빠른 요리' };
@@ -1919,7 +1960,21 @@ ${ingrList}
   try {
     let text = '';
 
-    if (provider === 'gemini') {
+    if (workerUrl) {
+      // ── Worker 경유 (API 키 서버 보관) ──
+      const model = provider === 'gemini'
+        ? (state.geminiModel || localStorage.getItem('fridge_gemini_model') || 'gemini-2.0-flash')
+        : (state.claudeModel || localStorage.getItem('fridge_claude_model') || 'claude-sonnet-4-6');
+      const res = await fetch(`${workerUrl}/api/recipe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, provider, model }),
+      });
+      if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Worker 오류'); }
+      const data = await res.json();
+      text = data.text || '';
+
+    } else if (provider === 'gemini') {
       // ── Gemini API ──
       const model = state.geminiModel || localStorage.getItem('fridge_gemini_model') || 'gemini-2.0-flash';
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${activeKey}`;
@@ -2056,18 +2111,15 @@ function submitReview(recipeIdx) {
   showToast('평가가 저장되었습니다 ⭐');
 }
 
-function saveRecipe(idx) {
+async function saveRecipe(idx) {
   const recipe = state.currentRecipes[idx];
   if (!recipe) return;
   const id = Date.now().toString();
   recipe._savedId = id;
-  state.savedRecipes.push({
-    ...recipe,
-    id,
-    savedAt: today(),
-    review: recipe.review || null,
-  });
+  const entry = { ...recipe, id, savedAt: today(), review: recipe.review || null };
+  state.savedRecipes.push(entry);
   saveState();
+  await apiSaveRecipe(entry); // Notion 동기 저장 (Worker 있을 때만 실행)
   showToast(`💾 "${recipe.title}" 저장됨!`);
 }
 
@@ -2164,22 +2216,29 @@ function updateApiStatus() {
   const provider = localStorage.getItem('fridge_provider');
   const claudeKey = localStorage.getItem('fridge_api_key');
   const geminiKey = localStorage.getItem('fridge_gemini_key');
+  const workerUrl = localStorage.getItem('fridge_worker_url');
   const el = document.getElementById('api-status-inner');
   if (!el) return;
 
-  if (provider === 'claude' && claudeKey) {
+  if (workerUrl) {
+    el.innerHTML = `<div style="font-size:22px;">☁️</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent-teal);">Worker 모드</div>
+        <div style="font-size:11px;color:var(--muted);">API 키가 서버에서 관리됩니다</div>
+      </div>`;
+  } else if (provider === 'claude' && claudeKey) {
     const model = localStorage.getItem('fridge_claude_model') || 'claude-sonnet-4-6';
     el.innerHTML = `<div style="font-size:22px;">🟣</div>
       <div>
         <div style="font-size:13px;font-weight:700;color:var(--accent);">Claude 연결됨</div>
-        <div style="font-size:11px;color:var(--muted);">${model} · 키: sk-ant-...${claudeKey.slice(-4)}</div>
+        <div style="font-size:11px;color:var(--muted);">${model} · ...${claudeKey.slice(-4)}</div>
       </div>`;
   } else if (provider === 'gemini' && geminiKey) {
     const model = localStorage.getItem('fridge_gemini_model') || 'gemini-2.0-flash';
     el.innerHTML = `<div style="font-size:22px;">🔵</div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#1a73e8;">Gemini 연결됨</div>
-        <div style="font-size:11px;color:var(--muted);">${model} · 키: AIza...${geminiKey.slice(-4)}</div>
+        <div style="font-size:11px;color:var(--muted);">${model} · ...${geminiKey.slice(-4)}</div>
       </div>`;
   } else {
     el.innerHTML = `<div style="font-size:22px;">⚪</div>
@@ -2188,6 +2247,153 @@ function updateApiStatus() {
         <div style="font-size:11px;color:var(--muted);">위에서 키를 입력하고 저장하세요</div>
       </div>`;
   }
+}
+
+// ============================================================
+//   WORKER URL 설정
+// ============================================================
+function saveWorkerUrl() {
+  const url = document.getElementById('worker-url-input').value.trim().replace(/\/$/, '');
+  if (!url) { showToast('Worker URL을 입력해주세요'); return; }
+  if (!url.startsWith('https://')) { showToast('https:// 로 시작해야 합니다'); return; }
+  state.workerUrl = url;
+  localStorage.setItem('fridge_worker_url', url);
+  updateApiStatus();
+  showToast('☁️ Worker URL이 저장되었습니다');
+}
+
+async function testWorker() {
+  const url = document.getElementById('worker-url-input').value.trim().replace(/\/$/, '')
+    || localStorage.getItem('fridge_worker_url') || '';
+  if (!url) { showToast('Worker URL을 먼저 입력해주세요'); return; }
+
+  const statusEl = document.getElementById('worker-status');
+  const iconEl   = document.getElementById('worker-status-icon');
+  const textEl   = document.getElementById('worker-status-text');
+  const subEl    = document.getElementById('worker-status-sub');
+  statusEl.style.display = 'block';
+  iconEl.textContent = '⏳'; textEl.textContent = '연결 확인 중...'; subEl.textContent = '';
+
+  try {
+    const res = await fetch(`${url}/api/health`, { signal: AbortSignal.timeout(8000) });
+    const data = await res.json();
+    if (data.ok) {
+      const services = data.services || {};
+      iconEl.textContent = '✅';
+      textEl.textContent = 'Worker 연결 성공!';
+      textEl.style.color = 'var(--accent-teal)';
+      subEl.textContent = [
+        services.claude  ? '🟣 Claude' : '🟣 Claude ✗',
+        services.gemini  ? '🔵 Gemini' : '🔵 Gemini ✗',
+        services.notion  ? '📝 Notion' : '📝 Notion ✗',
+      ].join('  ');
+    } else { throw new Error('health check 실패'); }
+  } catch(e) {
+    iconEl.textContent = '❌';
+    textEl.textContent = '연결 실패';
+    textEl.style.color = 'var(--danger)';
+    subEl.textContent = e.message;
+  }
+}
+
+// ============================================================
+//   저장소 선택 (local / notion)
+// ============================================================
+function selectStorage(type, el) {
+  state.storageType = type;
+  localStorage.setItem('fridge_storage', type);
+  document.querySelectorAll('[id^="storage-"]').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const notice = document.getElementById('storage-notice');
+  if (type === 'notion') {
+    const workerUrl = localStorage.getItem('fridge_worker_url');
+    if (!workerUrl) {
+      notice.textContent = '⚠️ Notion 저장은 Worker URL 설정이 필요합니다.';
+      notice.style.color = 'var(--danger)';
+      state.storageType = 'local';
+      localStorage.setItem('fridge_storage', 'local');
+      document.getElementById('storage-local').classList.add('active');
+      el.classList.remove('active');
+    } else {
+      notice.textContent = '📝 재료와 레시피가 Notion DB에 저장됩니다.';
+      notice.style.color = 'var(--accent-teal)';
+    }
+  } else {
+    notice.textContent = '📱 현재: 이 기기 브라우저에만 저장됩니다.';
+    notice.style.color = 'var(--muted)';
+  }
+}
+
+// ============================================================
+//   API 레이어 - Worker 우선, 없으면 직접 호출
+// ============================================================
+function getWorkerUrl() {
+  return state.workerUrl || localStorage.getItem('fridge_worker_url') || '';
+}
+
+function useWorker() {
+  return !!getWorkerUrl();
+}
+
+// 재료 저장
+async function apiSaveIngredient(ingr) {
+  if (!useWorker() || state.storageType !== 'notion') return; // local만이면 skip
+  try {
+    const res = await fetch(`${getWorkerUrl()}/api/ingredients`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ingr),
+    });
+    const data = await res.json();
+    if (data.ingredient?.id) ingr.notionId = data.ingredient.id; // Notion page ID 저장
+  } catch(e) { console.warn('Notion 재료 저장 실패 (로컬 유지):', e.message); }
+}
+
+// 재료 수정
+async function apiUpdateIngredient(ingr) {
+  if (!useWorker() || state.storageType !== 'notion' || !ingr.notionId) return;
+  try {
+    await fetch(`${getWorkerUrl()}/api/ingredients/${ingr.notionId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ingr),
+    });
+  } catch(e) { console.warn('Notion 재료 수정 실패:', e.message); }
+}
+
+// 재료 삭제
+async function apiDeleteIngredient(notionId) {
+  if (!useWorker() || state.storageType !== 'notion' || !notionId) return;
+  try {
+    await fetch(`${getWorkerUrl()}/api/ingredients/${notionId}`, { method: 'DELETE' });
+  } catch(e) { console.warn('Notion 재료 삭제 실패:', e.message); }
+}
+
+// 레시피 저장
+async function apiSaveRecipe(recipe) {
+  if (!useWorker() || state.storageType !== 'notion') return;
+  try {
+    const provider = localStorage.getItem('fridge_provider') || 'claude';
+    const res = await fetch(`${getWorkerUrl()}/api/saved-recipes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...recipe, provider }),
+    });
+    const data = await res.json();
+    if (data.recipe?.id) recipe.notionId = data.recipe.id;
+  } catch(e) { console.warn('Notion 레시피 저장 실패 (로컬 유지):', e.message); }
+}
+
+// 레시피 리뷰 업데이트
+async function apiUpdateRecipe(recipe) {
+  if (!useWorker() || state.storageType !== 'notion' || !recipe.notionId) return;
+  try {
+    await fetch(`${getWorkerUrl()}/api/saved-recipes/${recipe.notionId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(recipe),
+    });
+  } catch(e) { console.warn('Notion 레시피 업데이트 실패:', e.message); }
 }
 
 function clearAllData() {
@@ -2215,13 +2421,25 @@ function showToast(msg) {
 // ============================================================
 //   INIT
 // ============================================================
-loadState();
-renderIngredients();
+document.addEventListener('DOMContentLoaded', () => {
+  try { loadState(); } catch(e) { console.warn('loadState 오류:', e); }
+  try { renderIngredients(); } catch(e) { console.warn('renderIngredients 오류:', e); }
 
-// PWA Service Worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
+  // 카테고리 탭 이벤트 (DOMContentLoaded 후 붙여야 안전)
+  document.querySelectorAll('#fridge-cat-tabs .cat-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#fridge-cat-tabs .cat-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.currentCat = btn.dataset.cat;
+      renderIngredients();
+    });
+  });
+
+  // PWA Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+});
 </script>
 </body>
 </html>
