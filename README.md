@@ -1,7 +1,7 @@
 # 냉파 레시피 (chef-c)
 
 냉장고 재료로 레시피를 추천받고, 부족한 재료는 쿠팡 링크로 바로 주문하는 웹앱.
-https://hyunra94.github.io/chef-c/
+https://hyunra.kr/chef-c/
 
 ## 구조
 - **화면**: GitHub Pages (`index.html`, PWA)
@@ -25,7 +25,7 @@ Supabase 대시보드 > Edge Functions > Secrets
 - `ANTHROPIC_API_KEY` (필수)
 - `CLAUDE_MODEL` (선택, 기본 `claude-haiku-4-5-20251001`)
 - `DAILY_FREE_LIMIT` (선택, 기본 5)
-- `ALLOWED_ORIGINS` (선택, 기본 `https://hyunra94.github.io`)
+- `ALLOWED_ORIGINS` (선택, 기본 `https://hyunra.kr,https://hyunra94.github.io`)
 
 ## 관리자 지정
 처음 로그인한 뒤 SQL Editor에서:

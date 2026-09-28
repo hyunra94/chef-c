@@ -6,7 +6,7 @@
 //   ANTHROPIC_API_KEY  (필수)
 //   CLAUDE_MODEL       (선택, 기본 claude-haiku-4-5-20251001)
 //   DAILY_FREE_LIMIT   (선택, 기본 5)
-//   ALLOWED_ORIGINS    (선택, 쉼표 구분. 기본 https://hyunra94.github.io)
+//   ALLOWED_ORIGINS    (선택, 쉼표 구분. 기본 https://hyunra.kr,https://hyunra94.github.io)
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -15,7 +15,7 @@ const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const MODEL = Deno.env.get("CLAUDE_MODEL") || "claude-haiku-4-5-20251001";
 const LIMIT = Number(Deno.env.get("DAILY_FREE_LIMIT") || 5);
-const ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") || "https://hyunra94.github.io")
+const ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") || "https://hyunra.kr,https://hyunra94.github.io")
   .split(",").map((s) => s.trim()).filter(Boolean);
 
 function cors(req: Request) {
