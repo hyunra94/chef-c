@@ -1,42 +1,24 @@
-const CACHE_NAME = 'fridge-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap'
-];
+// 냉파 레시피 service worker: 화면은 항상 최신(network-first), 오프라인이면 캐시
+const CACHE = 'nangpa-v1';
+const ASSETS = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS.filter(u => !u.startsWith('https://fonts'))))
-  );
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
   self.skipWaiting();
 });
-
 self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
-  );
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
   self.clients.claim();
 });
-
 self.addEventListener('fetch', e => {
-  // API calls - always network
-  if (e.request.url.includes('api.anthropic.com')) return;
-
+  const url = new URL(e.request.url);
+  // 같은 사이트의 GET 요청만 처리 (Supabase, Anthropic, 쿠팡 등은 그대로 통과)
+  if (e.request.method !== 'GET' || url.origin !== location.origin) return;
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(response => {
-        // Font files 캐시
-        if (e.request.url.includes('fonts.g')) {
-          const cloned = response.clone();
-          caches.open(CACHE_NAME).then(c => c.put(e.request, cloned));
-        }
-        return response;
-      }).catch(() => caches.match('./index.html'));
-    })
+    fetch(e.request).then(res => {
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, copy));
+      return res;
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('./index.html')))
   );
 });

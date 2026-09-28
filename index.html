@@ -1,1181 +1,721 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>냉장고를 부탁해</title>
-  <meta name="description" content="냉장고 속 재료로 AI가 레시피를 추천해드려요" />
-  <meta name="theme-color" content="#E0E5EC" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="냉장고 부탁해" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #E0E5EC;
-      --fg: #3D4852;
-      --muted: #6B7280;
-      --accent: #6C63FF;
-      --accent-light: #8B84FF;
-      --accent-teal: #38B2AC;
-      --danger: #E05C5C;
-      --r-card: 32px;
-      --r-btn: 16px;
-      --r-inner: 12px;
-      --transition: 300ms ease-out;
-      --shadow-extruded: 9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5);
-      --shadow-extruded-hover: 12px 12px 20px rgba(163,177,198,0.7), -12px -12px 20px rgba(255,255,255,0.6);
-      --shadow-extruded-sm: 5px 5px 10px rgba(163,177,198,0.6), -5px -5px 10px rgba(255,255,255,0.5);
-      --shadow-inset: inset 6px 6px 10px rgba(163,177,198,0.6), inset -6px -6px 10px rgba(255,255,255,0.5);
-      --shadow-inset-deep: inset 10px 10px 20px rgba(163,177,198,0.7), inset -10px -10px 20px rgba(255,255,255,0.6);
-      --shadow-inset-sm: inset 3px 3px 6px rgba(163,177,198,0.6), inset -3px -3px 6px rgba(255,255,255,0.5);
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      min-height: 100vh;
-      font-size: 15px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-    button { font-family: inherit; cursor: pointer; border: none; background: none; }
-    input, textarea, select { font-family: inherit; }
-
-    /* ── 유틸 ── */
-    .neu-btn {
-      background: var(--bg);
-      border-radius: var(--r-btn);
-      box-shadow: var(--shadow-extruded-sm);
-      transition: all var(--transition);
-      color: var(--fg);
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-height: 44px;
-      padding: 10px 20px;
-      font-size: 14px;
-    }
-    .neu-btn:hover { box-shadow: var(--shadow-extruded-hover); transform: translateY(-1px); }
-    .neu-btn:active { box-shadow: var(--shadow-inset-sm); transform: translateY(0.5px); }
-    .neu-btn-accent {
-      background: var(--accent); color: #fff;
-      box-shadow: 5px 5px 10px rgba(108,99,255,0.4), -5px -5px 10px rgba(255,255,255,0.3);
-    }
-    .neu-btn-accent:hover { background: var(--accent-light); box-shadow: 8px 8px 16px rgba(108,99,255,0.45), -8px -8px 16px rgba(255,255,255,0.35); transform: translateY(-1px); }
-    .neu-btn-accent:active { box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2), inset -4px -4px 8px rgba(255,255,255,0.1); transform: translateY(0.5px); }
-    .neu-input {
-      width: 100%; background: var(--bg); border: none; outline: none;
-      border-radius: var(--r-btn); box-shadow: var(--shadow-inset);
-      padding: 12px 16px; color: var(--fg); font-size: 14px;
-      transition: box-shadow var(--transition);
-    }
-    .neu-input:focus { box-shadow: var(--shadow-inset-deep); }
-    .neu-input::placeholder { color: #A0AEC0; }
-    .text-muted { color: var(--muted); }
-    .text-accent { color: var(--accent); }
-    .text-teal { color: var(--accent-teal); }
-    .text-danger { color: var(--danger); }
-    .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; font-size: 11px; font-weight: 700; padding: 2px 10px; min-height: 22px; }
-    .badge-sauce { background: rgba(255,165,0,0.15); color: #C07A00; }
-    .badge-main  { background: rgba(108,99,255,0.12); color: var(--accent); }
-    .badge-sub   { background: rgba(56,178,172,0.12); color: var(--accent-teal); }
-
-    /* ── 레이아웃 ── */
-    .app-container { max-width: 480px; margin: 0 auto; padding: 0 16px 100px; }
-
-    /* ── 헤더 ── */
-    .app-header { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 16px 0 12px; }
-    .header-inner { display: flex; align-items: center; justify-content: space-between; }
-    .app-logo { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 20px; color: var(--fg); display: flex; align-items: center; gap: 8px; }
-    .logo-icon { width: 40px; height: 40px; border-radius: 14px; background: var(--bg); box-shadow: var(--shadow-extruded-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; animation: float 3s ease-in-out infinite; }
-    .header-subtitle { font-size: 11px; color: var(--muted); font-weight: 400; }
-
-    /* ── 바텀 네비 ── */
-    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--bg); padding: 10px 20px 20px; z-index: 100; box-shadow: 0 -4px 20px rgba(163,177,198,0.35); }
-    .nav-items { display: flex; justify-content: space-around; align-items: center; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 16px; border-radius: var(--r-inner); transition: all var(--transition); cursor: pointer; min-width: 60px; color: var(--muted); font-size: 11px; font-weight: 500; background: none; border: none; }
-    .nav-item .nav-icon { font-size: 20px; }
-    .nav-item.active { color: var(--accent); box-shadow: var(--shadow-inset); }
-    .nav-item:not(.active):hover { color: var(--fg); transform: translateY(-1px); }
-
-    /* ── 페이지 ── */
-    .page { display: none; }
-    .page.active { display: block; }
-
-    /* ── 섹션 타이틀 ── */
-    .section-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; color: var(--fg); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-
-    /* ── 냉장고 요약 ── */
-    .fridge-summary { background: var(--bg); border-radius: var(--r-card); box-shadow: var(--shadow-extruded); padding: 20px 24px; margin-bottom: 20px; display: flex; justify-content: space-around; }
-    .summary-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .summary-num { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 26px; font-weight: 800; color: var(--fg); }
-    .summary-num.warn { color: var(--danger); }
-    .summary-label { font-size: 10px; color: var(--muted); }
-    .summary-divider { width: 1px; background: rgba(163,177,198,0.4); height: 40px; align-self: center; }
-
-    /* ── 카테고리 탭 ── */
-    .cat-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-    .cat-tabs::-webkit-scrollbar { display: none; }
-    .cat-tab { flex-shrink: 0; padding: 8px 18px; border-radius: 999px; font-size: 13px; font-weight: 500; background: var(--bg); box-shadow: var(--shadow-extruded-sm); color: var(--muted); transition: all var(--transition); cursor: pointer; border: none; }
-    .cat-tab.active { box-shadow: var(--shadow-inset); color: var(--accent); font-weight: 700; }
-    .cat-tab:not(.active):hover { transform: translateY(-1px); color: var(--fg); }
-
-    /* ── 재료 카드 ── */
-    .ingredient-list { display: flex; flex-direction: column; gap: 10px; }
-    .ingredient-card { background: var(--bg); border-radius: 20px; box-shadow: var(--shadow-extruded-sm); padding: 14px 16px; display: flex; align-items: center; gap: 12px; transition: all var(--transition); }
-    .ingredient-card:hover { box-shadow: var(--shadow-extruded); transform: translateY(-1px); }
-    .ingredient-card.expiring-soon { border-left: 3px solid var(--danger); }
-    .ingredient-card.checked-for-recipe { box-shadow: var(--shadow-inset-sm); transform: translateY(0); }
-    .ingredient-card.checked-for-recipe .ingredient-name { color: var(--accent); }
-    .ingredient-card.consumed { opacity: 0.45; box-shadow: var(--shadow-inset-sm); }
-    .ingredient-card.consumed .ingredient-name { text-decoration: line-through; color: var(--muted); }
-    .ingredient-emoji { width: 44px; height: 44px; border-radius: var(--r-inner); box-shadow: var(--shadow-inset); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-    .ingredient-info { flex: 1; min-width: 0; cursor: pointer; }
-    .ingredient-name { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .ingredient-meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
-    .ingredient-date { font-size: 11px; color: var(--muted); }
-    .exp-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
-    .exp-ok    { background: rgba(56,178,172,0.12); color: var(--accent-teal); }
-    .exp-warn  { background: rgba(255,165,0,0.15);  color: #C07A00; }
-    .exp-danger{ background: rgba(224,92,92,0.12);  color: var(--danger); }
-
-    /* 레시피 선택 체크 */
-    .recipe-check { width: 22px; height: 22px; border-radius: 8px; box-shadow: var(--shadow-extruded-sm); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; font-size: 13px; transition: all var(--transition); border: none; background: var(--bg); color: transparent; }
-    .recipe-check.checked { box-shadow: var(--shadow-inset-sm); color: var(--accent); }
-
-    /* 소진 버튼 */
-    .consumed-btn { flex-shrink: 0; padding: 6px 12px; border-radius: 10px; background: var(--bg); box-shadow: var(--shadow-extruded-sm); font-size: 11px; font-weight: 700; color: var(--muted); cursor: pointer; border: none; transition: all var(--transition); white-space: nowrap; }
-    .consumed-btn:hover { color: var(--danger); box-shadow: var(--shadow-extruded); transform: translateY(-1px); }
-    .consumed-btn:active { box-shadow: var(--shadow-inset-sm); transform: translateY(0.5px); }
-    .ingredient-card.consumed .consumed-btn { color: var(--accent-teal); box-shadow: var(--shadow-inset-sm); }
-
-    /* 빈 상태 */
-    .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
-    .empty-icon { font-size: 56px; margin-bottom: 12px; }
-    .empty-text { font-size: 15px; font-weight: 500; margin-bottom: 4px; color: var(--fg); }
-    .empty-sub  { font-size: 13px; }
-
-    /* FAB */
-    .fab { position: fixed; bottom: 82px; right: calc(50% - 230px); width: 56px; height: 56px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 26px; display: flex; align-items: center; justify-content: center; box-shadow: 6px 6px 14px rgba(108,99,255,0.4), -6px -6px 14px rgba(255,255,255,0.3); cursor: pointer; transition: all var(--transition); border: none; line-height: 1; }
-    .fab:hover { transform: translateY(-2px) scale(1.05); }
-    .fab:active { transform: scale(0.95); }
-    @media (max-width: 480px) { .fab { right: 20px; } }
-
-    /* ── 모달 / 바텀시트 ── */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(163,177,198,0.35); backdrop-filter: blur(6px); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
-    .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
-    .bottom-sheet { background: var(--bg); border-radius: 28px 28px 0 0; box-shadow: 0 -8px 30px rgba(163,177,198,0.5); padding: 24px 24px 44px; width: 100%; max-width: 480px; animation: slideUp 0.3s ease-out; max-height: 90vh; overflow-y: auto; }
-    .sheet-handle { width: 40px; height: 4px; border-radius: 999px; background: rgba(163,177,198,0.5); margin: 0 auto 20px; }
-    .sheet-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 20px; }
-    .form-group { margin-bottom: 16px; }
-    .form-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; display: block; }
-    .cat-select-row { display: flex; gap: 8px; }
-    .cat-select-btn { flex: 1; padding: 10px 8px; border-radius: var(--r-inner); font-size: 13px; font-weight: 500; background: var(--bg); box-shadow: var(--shadow-extruded-sm); color: var(--muted); transition: all var(--transition); cursor: pointer; text-align: center; border: none; }
-    .cat-select-btn.active { box-shadow: var(--shadow-inset); color: var(--accent); font-weight: 700; }
-    .date-row { display: flex; align-items: center; gap: 10px; }
-    .toggle-btn { flex-shrink: 0; padding: 10px 14px; border-radius: var(--r-inner); font-size: 12px; font-weight: 600; background: var(--bg); box-shadow: var(--shadow-extruded-sm); color: var(--muted); transition: all var(--transition); cursor: pointer; white-space: nowrap; border: none; }
-    .toggle-btn.on { box-shadow: var(--shadow-inset-sm); color: var(--accent); }
-    .sheet-actions { display: flex; gap: 10px; margin-top: 24px; }
-    .sheet-actions .neu-btn { flex: 1; padding: 14px; font-size: 15px; }
-    .emoji-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-    .emoji-opt { width: 40px; height: 40px; border-radius: 12px; box-shadow: var(--shadow-extruded-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: all var(--transition); }
-    .emoji-opt:hover { transform: scale(1.1); }
-    .emoji-opt.selected { box-shadow: var(--shadow-inset); transform: scale(1.05); }
-
-    /* ── 레시피 탭 ── */
-    .recipe-prompt-card { background: var(--bg); border-radius: var(--r-card); box-shadow: var(--shadow-extruded); padding: 24px; margin-bottom: 20px; }
-    .recipe-prompt-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 6px; }
-    .recipe-prompt-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
-    .selected-ingredients { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; min-height: 36px; }
-    .sel-chip { display: inline-flex; align-items: center; gap: 4px; background: var(--bg); box-shadow: var(--shadow-inset-sm); border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--accent); }
-    .sel-chip .chip-remove { font-size: 14px; color: var(--muted); cursor: pointer; margin-left: 2px; }
-    .recipe-options-row { display: flex; gap: 10px; margin-bottom: 16px; }
-    .recipe-option-btn { flex: 1; padding: 10px 8px; border-radius: var(--r-inner); font-size: 12px; font-weight: 600; background: var(--bg); box-shadow: var(--shadow-extruded-sm); color: var(--muted); transition: all var(--transition); cursor: pointer; text-align: center; border: none; }
-    .recipe-option-btn.on { box-shadow: var(--shadow-inset); color: var(--accent); }
-    .recipe-card { background: var(--bg); border-radius: var(--r-card); box-shadow: var(--shadow-extruded); padding: 22px; margin-bottom: 16px; transition: all var(--transition); }
-    .recipe-card:hover { box-shadow: var(--shadow-extruded-hover); transform: translateY(-2px); }
-    .recipe-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
-    .recipe-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 1.3; flex: 1; }
-    .recipe-title-icon { font-size: 28px; margin-left: 10px; }
-    .recipe-meta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-    .recipe-meta-tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; box-shadow: var(--shadow-inset-sm); color: var(--muted); }
-    .recipe-steps-preview { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
-    .recipe-ingredients-used { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-    .used-chip { font-size: 11px; padding: 3px 10px; border-radius: 999px; background: rgba(108,99,255,0.1); color: var(--accent); font-weight: 500; }
-    .recipe-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .recipe-actions .neu-btn { flex: 1; min-width: 80px; font-size: 13px; padding: 10px 14px; }
-    .review-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(163,177,198,0.3); }
-    .star-row { display: flex; gap: 4px; margin-bottom: 10px; }
-    .star-btn { font-size: 24px; cursor: pointer; transition: transform 0.2s; background: none; border: none; padding: 0; }
-    .star-btn:hover { transform: scale(1.2); }
-    .review-input { width: 100%; background: var(--bg); border: none; outline: none; border-radius: var(--r-inner); box-shadow: var(--shadow-inset); padding: 10px 14px; color: var(--fg); font-size: 13px; resize: none; min-height: 70px; transition: box-shadow var(--transition); }
-    .review-input:focus { box-shadow: var(--shadow-inset-deep); }
-    .review-input::placeholder { color: #A0AEC0; }
-    .recipe-detail { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(163,177,198,0.3); }
-    .recipe-detail.open { display: block; }
-    .step-list { list-style: none; }
-    .step-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 13px; line-height: 1.6; }
-    .step-num { flex-shrink: 0; width: 24px; height: 24px; border-radius: 999px; background: var(--bg); box-shadow: var(--shadow-inset-sm); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--accent); margin-top: 1px; }
-    .ai-loading { text-align: center; padding: 48px 24px; }
-    .ai-spinner { width: 64px; height: 64px; border-radius: 50%; box-shadow: var(--shadow-extruded); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 28px; animation: spin 2s linear infinite; }
-    .ai-loading-text { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-
-    /* ── 저장됨 탭 ── */
-    .saved-recipe-card { background: var(--bg); border-radius: var(--r-card); box-shadow: var(--shadow-extruded); padding: 20px; margin-bottom: 14px; transition: all var(--transition); }
-    .saved-recipe-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-extruded-hover); }
-    .saved-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .saved-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; }
-    .saved-meta { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
-    .saved-review { font-size: 13px; color: var(--fg); padding: 8px 12px; border-radius: var(--r-inner); box-shadow: var(--shadow-inset-sm); margin-bottom: 8px; }
-
-    /* ── 설정 ── */
-    .settings-card { background: var(--bg); border-radius: var(--r-card); box-shadow: var(--shadow-extruded); padding: 24px; margin-bottom: 16px; }
-    .settings-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-    .save-notice { font-size: 11px; color: var(--muted); margin-top: 8px; }
-
-    /* ── 토스트 ── */
-    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--fg); color: #fff; border-radius: 999px; padding: 10px 22px; font-size: 13px; font-weight: 600; z-index: 999; opacity: 0; transition: opacity 0.3s; white-space: nowrap; pointer-events: none; }
-    .toast.show { opacity: 1; }
-
-    /* ── 애니메이션 ── */
-    @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    @keyframes float   { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-    @keyframes spin    { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>냉파 레시피</title>
+  <meta name="description" content="냉장고 재료로 레시피를 추천받고, 부족한 재료는 바로 주문하는 냉장고 파먹기 도우미">
+  <link rel="icon" type="image/png" href="https://hyunra94.github.io/assets/favicon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="냉파 레시피">
+  <meta property="og:description" content="냉장고 재료로 레시피를 추천받고, 부족한 재료는 바로 주문하세요">
+  <meta property="og:image" content="https://hyunra94.github.io/assets/og-default.png">
+  <meta property="og:url" content="https://hyunra94.github.io/chef-c/">
+  <meta name="theme-color" content="#F2F8F6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="냉파 레시피">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#F2F8F6; --surface:#FFFFFF; --surface-2:#F7FBFA; --ink:#23403C; --muted:#6A8581;
+  --line:#DCEAE6; --mint:#CDEEE0; --mint-ink:#2F8A69; --sky:#D6EAF7; --sky-ink:#35729F;
+  --pink:#FBDDE2; --pink-ink:#B04660; --amber:#FCEBC8; --amber-ink:#9A6512; --on-accent:#FFFFFF;
+  --shadow:0 6px 20px rgba(47,110,95,.08),0 1px 3px rgba(47,110,95,.06);
+  --radius:18px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    color-scheme:dark;
+    --bg:#121E1D; --surface:#1A2A28; --surface-2:#1F3230; --ink:#E2F1ED; --muted:#93AEA9;
+    --line:#2B403D; --mint:#1F4539; --mint-ink:#86D6B6; --sky:#1C3A4E; --sky-ink:#93C8EE;
+    --pink:#46232D; --pink-ink:#F3A9B9; --amber:#44351A; --amber-ink:#F0C877; --on-accent:#10201C;
+    --shadow:0 6px 20px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:15px;line-height:1.6;
+  padding:calc(24px + env(safe-area-inset-top,0px)) 16px calc(48px + env(safe-area-inset-bottom,0px))}
+[hidden]{display:none!important}
+.wrap{max-width:1120px;margin:0 auto;display:grid;gap:20px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.logo{font-family:"Jua","Noto Sans KR",sans-serif;font-size:34px;line-height:1.1;margin:0;letter-spacing:.5px;font-weight:400}
+.logo span{color:var(--mint-ink)}
+.sub{margin:4px 0 0;color:var(--muted);font-size:14px}
+.who{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:20px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.col{display:grid;gap:20px;min-width:0}
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;display:grid;gap:14px;min-width:0}
+h2{font-size:17px;margin:0;font-weight:800;text-wrap:balance;display:flex;align-items:center;gap:8px}
+h2 .count{font-size:12px;font-weight:700;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);padding:1px 8px;border-radius:999px}
+h3{font-size:15px;margin:0;font-weight:800}
+.hint{font-size:13px;color:var(--muted);margin:0}
+label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.2px}
+input,textarea,select{font:inherit;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:9px 12px;width:100%}
+input[type=checkbox]{width:auto;accent-color:var(--mint-ink)}
+textarea{resize:vertical;min-height:70px}
+input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--sky-ink);outline-offset:2px}
+.field{display:grid;gap:4px;min-width:0}
+.check{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:700;color:var(--ink)}
+.form{display:grid;gap:10px;grid-template-columns:repeat(6,minmax(0,1fr))}
+.form .c3{grid-column:span 3}.form .c6{grid-column:span 6}
+@media (max-width:480px){.form .c3{grid-column:span 6}}
+button{font:inherit;cursor:pointer;border-radius:12px;padding:9px 14px;font-weight:700;background:var(--surface-2);color:var(--ink);border:1px solid var(--line)}
+button:hover{filter:brightness(.97)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--mint-ink);color:var(--on-accent);border-color:transparent}
+.btn-sm{padding:4px 10px;font-size:12px;border-radius:10px}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode{display:grid;gap:2px;text-align:left;padding:14px;border-radius:16px;border:2px solid var(--line);background:var(--surface-2)}
+.mode b{font-size:15px}
+.mode small{font-weight:500;color:var(--muted);font-size:12px;line-height:1.4}
+.mode[aria-pressed="true"].m-fridge{border-color:var(--mint-ink);background:var(--mint)}
+.mode[aria-pressed="true"].m-order{border-color:var(--sky-ink);background:var(--sky)}
+.mode .ico{width:22px;height:22px;margin-bottom:4px}
+.list{display:grid;gap:8px;list-style:none;margin:0;padding:0}
+.ing{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:10px 12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line)}
+@media (max-width:480px){.ing{grid-template-columns:1fr}}
+.ing.out{opacity:.6}
+.ing .name{font-weight:700;display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0;overflow-wrap:anywhere}
+.meta{font-size:12px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.chip.ok{background:var(--mint);color:var(--mint-ink)}
+.chip.miss{background:var(--pink);color:var(--pink-ink)}
+.chip.warn{background:var(--amber);color:var(--amber-ink)}
+.chip.info{background:var(--sky);color:var(--sky-ink)}
+.chip.plain{background:transparent;border:1px solid var(--line);color:var(--muted)}
+a.buy{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;text-decoration:none;padding:3px 10px;border-radius:999px;background:var(--sky);color:var(--sky-ink)}
+a.buy:hover{text-decoration:underline}
+a.buy.pick{background:var(--pink);color:var(--pink-ink)}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.staples{display:flex;flex-wrap:wrap;gap:6px}
+.staples .chip button{all:unset;cursor:pointer;font-weight:800;padding-left:2px}
+.ask{display:flex;gap:8px;flex-wrap:wrap}
+.ask input{flex:1 1 220px}
+.results{display:grid;gap:12px}
+.recipe{border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:10px;background:var(--surface)}
+.recipe-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
+.recipe .why{font-size:13px;color:var(--muted);margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.steps{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--sky-ink)}
+.buybox{background:var(--surface-2);border:1px dashed var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:6px}
+.buybox .t{font-size:12px;font-weight:800;color:var(--muted)}
+.source{font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--muted)}
+.empty{padding:18px;border-radius:14px;background:var(--surface-2);color:var(--muted);font-size:14px;text-align:center}
+.status{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mint-ink);animation:pulse 1s infinite alternate}
+@keyframes pulse{from{opacity:.3}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.dot{animation:none}}
+.err{color:var(--pink-ink);font-size:13px;margin:0}
+.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.pick{border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:6px;background:var(--surface-2)}
+.pick b{overflow-wrap:anywhere}
+.disclose{background:var(--surface-2);border-radius:12px;padding:10px 14px;font-size:12px;color:var(--muted);margin:0}
+.quota{font-size:12px;color:var(--muted)}
+.hero{display:grid;gap:10px}
+.hero p{margin:0;max-width:60ch}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:13px;font-weight:700;box-shadow:var(--shadow);z-index:10;max-width:calc(100% - 32px);text-align:center}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+footer{font-size:12px;color:var(--muted);text-align:center}
+</style>
 </head>
 <body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 class="logo">냉파 <span>레시피</span></h1>
+      <p class="sub">냉장고에 있는 재료로 뭘 만들지, 뭘 더 사야 할지 한 번에 정해요.</p>
+    </div>
+    <div class="who" id="who">
+      <span id="whoEmail"></span>
+      <button type="button" class="btn-sm" id="settingsBtn" hidden>설정</button>
+      <button type="button" class="btn-sm" id="logoutBtn" hidden>로그아웃</button>
+    </div>
+  </header>
 
-<div class="toast" id="toast"></div>
+  <!-- 로그인 전 -->
+  <section class="card hero" id="loginCard" hidden aria-labelledby="h-login">
+    <h2 id="h-login">로그인하고 내 냉장고 만들기</h2>
+    <p class="hint">이메일로 로그인 링크를 보내드려요. 비밀번호는 필요 없어요. 로그인하면 AI 레시피 추천을 하루 5번 무료로 쓸 수 있어요.</p>
+    <form class="ask" id="loginForm" autocomplete="on">
+      <label class="sr" for="l-email">이메일</label>
+      <input id="l-email" type="email" required placeholder="you@example.com" autocomplete="email">
+      <button class="btn-primary" type="submit" id="loginBtn">로그인 링크 받기</button>
+    </form>
+    <p class="hint" id="loginMsg" hidden></p>
+  </section>
 
-<!-- 헤더 -->
-<div class="app-header">
-  <div class="app-container">
-    <div class="header-inner">
-      <div class="app-logo">
-        <div class="logo-icon">🧊</div>
-        <div>
-          <div>냉장고를 부탁해</div>
-          <div class="header-subtitle">AI 냉장고 레시피 매니저</div>
+  <!-- 설정 -->
+  <section class="card" id="settingsCard" hidden aria-labelledby="h-set">
+    <h2 id="h-set">설정</h2>
+    <div class="field">
+      <h3>내 Claude API 키 (선택)</h3>
+      <p class="hint">키를 넣으면 무료 횟수 제한 없이 추천받을 수 있어요. 키는 이 기기의 브라우저에만 저장되고, 추천할 때 Anthropic으로 바로 보내져요. 저희 서버로는 보내지 않아요. 사용 한도를 걸어둔 키를 쓰세요.</p>
+    </div>
+    <form class="form" id="keyForm" autocomplete="off">
+      <div class="field c6"><label for="k-key">API 키</label><input id="k-key" type="password" placeholder="sk-ant-..." autocomplete="off"></div>
+      <div class="field c6"><label for="k-model">모델</label>
+        <select id="k-model">
+          <option value="claude-sonnet-5">Claude Sonnet 5 (품질 우선)</option>
+          <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (빠르고 저렴)</option>
+        </select></div>
+      <div class="row-actions c6">
+        <button class="btn-primary" type="submit">키 저장</button>
+        <button type="button" id="keyDel">키 삭제</button>
+        <span class="quota" id="keyState"></span>
+      </div>
+    </form>
+    <div class="field" id="importBox" hidden>
+      <h3>예전 앱 데이터 가져오기</h3>
+      <p class="hint" id="importMsg"></p>
+      <div class="row-actions"><button type="button" id="importBtn">내 냉장고로 가져오기</button></div>
+    </div>
+  </section>
+
+  <div class="grid" id="app" hidden>
+    <div class="col">
+      <section class="card" aria-labelledby="h-fridge">
+        <h2 id="h-fridge">내 냉장고 <span class="count" id="fridgeCount">0</span></h2>
+        <div class="filters" role="group" aria-label="재료 보기">
+          <button type="button" data-f="in" aria-pressed="true">있는 재료</button>
+          <button type="button" data-f="soon" aria-pressed="false">유통기한 임박</button>
+          <button type="button" data-f="out" aria-pressed="false">다 먹은 재료</button>
         </div>
-      </div>
-      <button class="neu-btn" style="padding:10px 14px;font-size:13px;" onclick="showPage('settings')">⚙️</button>
-    </div>
-  </div>
-</div>
+        <ul class="list" id="ingList"></ul>
+        <form class="form" id="ingForm" autocomplete="off">
+          <h3 class="c6" id="ingFormTitle">재료 추가</h3>
+          <div class="field c3"><label for="f-name">재료명</label><input id="f-name" required maxlength="60" placeholder="예: 대파"></div>
+          <div class="field c3"><label for="f-qty">수량</label><input id="f-qty" maxlength="40" placeholder="예: 1단, 300g"></div>
+          <div class="field c3"><label for="f-exp">유통기한</label><input id="f-exp" type="date"></div>
+          <div class="field c3"><label for="f-cat">분류</label>
+            <select id="f-cat"><option>채소</option><option>육류</option><option>해산물</option><option>유제품·달걀</option><option>가공식품</option><option>양념·소스</option><option>기타</option></select></div>
+          <div class="field c6"><label for="f-link">쿠팡 파트너스 링크 (선택)</label><input id="f-link" type="url" placeholder="https://link.coupang.com/a/..."></div>
+          <label class="check c6" id="pickRow" hidden><input type="checkbox" id="f-pick"> 공개 PICK으로 보여주기 (모든 방문자에게 링크 노출)</label>
+          <div class="row-actions c6">
+            <button class="btn-primary" type="submit" id="ingSubmit">냉장고에 넣기</button>
+            <button type="button" id="ingCancel" hidden>수정 취소</button>
+          </div>
+        </form>
+      </section>
 
-<!-- 메인 -->
-<div class="app-container">
-
-  <!-- 냉장고 탭 -->
-  <div class="page active" id="page-fridge">
-    <div class="fridge-summary">
-      <div class="summary-item"><div class="summary-num" id="sum-total">0</div><div class="summary-label">전체 재료</div></div>
-      <div class="summary-divider"></div>
-      <div class="summary-item"><div class="summary-num warn" id="sum-expiring">0</div><div class="summary-label">곧 만료</div></div>
-      <div class="summary-divider"></div>
-      <div class="summary-item"><div class="summary-num text-teal" id="sum-recipe-check">0</div><div class="summary-label">레시피 선택</div></div>
-      <div class="summary-divider"></div>
-      <div class="summary-item"><div class="summary-num" id="sum-consumed" style="color:var(--muted);">0</div><div class="summary-label">소진됨</div></div>
-    </div>
-
-    <div class="cat-tabs" id="fridge-cat-tabs">
-      <button class="cat-tab active" data-cat="all">전체</button>
-      <button class="cat-tab" data-cat="main">🥩 메인</button>
-      <button class="cat-tab" data-cat="sub">🧅 서브</button>
-      <button class="cat-tab" data-cat="sauce">🫙 소스</button>
-    </div>
-
-    <div class="ingredient-list" id="ingredient-list"></div>
-  </div>
-
-  <!-- 레시피 탭 -->
-  <div class="page" id="page-recipe">
-    <div class="recipe-prompt-card">
-      <div class="recipe-prompt-title">🍳 오늘의 레시피</div>
-      <div class="recipe-prompt-sub">사용할 재료를 선택하거나 빠르게 추천받아보세요</div>
-      <div class="selected-ingredients" id="selected-ingredients-display">
-        <span class="text-muted" style="font-size:13px;padding:8px 0;">냉장고 탭에서 재료를 선택하거나 아래 옵션을 사용하세요</span>
-      </div>
-      <div class="recipe-options-row">
-        <button class="recipe-option-btn" id="opt-expiring" onclick="toggleRecipeOption('expiring')">🚨 만료 임박</button>
-        <button class="recipe-option-btn" id="opt-all"      onclick="toggleRecipeOption('all')">🎲 전체 재료</button>
-        <button class="recipe-option-btn" id="opt-healthy"  onclick="toggleRecipeOption('healthy')">🥗 건강식</button>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-        <button class="cat-tab active" id="mtype-all"     onclick="setMealType('all')"     style="font-size:12px;padding:6px 14px;">제한없음</button>
-        <button class="cat-tab"        id="mtype-korean"  onclick="setMealType('korean')"  style="font-size:12px;padding:6px 14px;">🍚 한식</button>
-        <button class="cat-tab"        id="mtype-western" onclick="setMealType('western')" style="font-size:12px;padding:6px 14px;">🍝 양식</button>
-        <button class="cat-tab"        id="mtype-quick"   onclick="setMealType('quick')"   style="font-size:12px;padding:6px 14px;">⚡ 10분</button>
-      </div>
-      <button class="neu-btn neu-btn-accent" style="width:100%;padding:14px;font-size:16px;" onclick="generateRecipes()">✨ AI 레시피 추천받기</button>
-    </div>
-    <div id="recipe-results"></div>
-  </div>
-
-  <!-- 저장됨 탭 -->
-  <div class="page" id="page-saved">
-    <div class="section-title">📚 저장한 레시피</div>
-    <div id="saved-list"></div>
-  </div>
-
-  <!-- 설정 탭 -->
-  <div class="page" id="page-settings">
-    <div class="section-title">⚙️ 설정</div>
-
-    <div class="settings-card">
-      <div class="settings-title">🤖 AI 제공자</div>
-      <div class="cat-select-row" style="margin-bottom:0;">
-        <button class="cat-select-btn active" id="provider-claude" onclick="selectProvider('claude',this)" style="padding:14px 8px;">
-          <div style="font-size:18px;margin-bottom:2px;">🟣</div>
-          <div style="font-weight:700;font-size:13px;">Claude</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Anthropic</div>
-        </button>
-        <button class="cat-select-btn" id="provider-gemini" onclick="selectProvider('gemini',this)" style="padding:14px 8px;">
-          <div style="font-size:18px;margin-bottom:2px;">🔵</div>
-          <div style="font-weight:700;font-size:13px;">Gemini</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Google</div>
-        </button>
-        <button class="cat-select-btn" id="provider-gpt" onclick="selectProvider('gpt',this)" style="padding:14px 8px;">
-          <div style="font-size:18px;margin-bottom:2px;">🟢</div>
-          <div style="font-weight:700;font-size:13px;">ChatGPT</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px;">OpenAI</div>
-        </button>
-      </div>
+      <section class="card" aria-labelledby="h-staples">
+        <h2 id="h-staples">기본 양념</h2>
+        <p class="hint">항상 집에 있다고 보는 재료예요. 냉장고 모드에서도 부족한 재료로 치지 않아요.</p>
+        <div class="staples" id="staples"></div>
+        <form class="ask" id="stapleForm" autocomplete="off">
+          <label class="sr" for="f-staple">양념 추가</label>
+          <input id="f-staple" maxlength="20" placeholder="예: 참기름">
+          <button type="submit">추가</button>
+        </form>
+      </section>
     </div>
 
-    <div class="settings-card" id="settings-claude">
-      <div class="settings-title">🟣 Claude 설정</div>
-      <div class="form-group">
-        <label class="form-label">API Key</label>
-        <input type="password" class="neu-input" id="claude-key-input" placeholder="sk-ant-api03-..." />
-        <div class="save-notice">Anthropic Console → API Keys</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">모델</label>
-        <div style="display:flex;gap:8px;">
-          <button class="cat-select-btn active" id="cmodel-sonnet" onclick="selectClaudeModel('claude-sonnet-4-6',this)" style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">Sonnet</div><div style="font-size:10px;color:var(--muted);">균형</div></button>
-          <button class="cat-select-btn"        id="cmodel-haiku"  onclick="selectClaudeModel('claude-haiku-4-5-20251001',this)" style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">Haiku</div><div style="font-size:10px;color:var(--muted);">저렴</div></button>
-          <button class="cat-select-btn"        id="cmodel-opus"   onclick="selectClaudeModel('claude-opus-4-6',this)" style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">Opus</div><div style="font-size:10px;color:var(--muted);">고품질</div></button>
+    <div class="col">
+      <section class="card" aria-labelledby="h-rec">
+        <h2 id="h-rec">오늘 뭐 해먹지?</h2>
+        <div class="modes" role="group" aria-label="추천 방식">
+          <button type="button" class="mode m-fridge" data-mode="fridge" aria-pressed="true">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M5 10h14M9 6v2M9 13v3"/></svg>
+            <b>냉장고 재료만</b><small>지금 있는 재료와 기본 양념만으로 만들 수 있는 요리</small>
+          </button>
+          <button type="button" class="mode m-order" data-mode="order" aria-pressed="false">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.5l2.2 11h10.6l2-8H7"/><circle cx="9.5" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></svg>
+            <b>재료 주문하기</b><small>몇 가지만 사면 되는 요리 + 부족한 재료 구매 링크</small>
+          </button>
         </div>
-      </div>
-      <button class="neu-btn neu-btn-accent" style="width:100%;padding:12px;" onclick="saveApiKey()">저장</button>
-    </div>
-
-    <div class="settings-card" id="settings-gemini" style="display:none;">
-      <div class="settings-title">🔵 Gemini 설정</div>
-      <div class="form-group">
-        <label class="form-label">API Key</label>
-        <input type="password" class="neu-input" id="gemini-key-input" placeholder="AIzaSy..." />
-        <div class="save-notice">Google AI Studio → Get API Key</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">모델</label>
-        <div style="display:flex;gap:8px;">
-          <button class="cat-select-btn active" id="gmodel-flash" onclick="selectGeminiModel('gemini-2.0-flash',this)" style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">Flash 2.0</div><div style="font-size:10px;color:var(--muted);">무료·빠름</div></button>
-          <button class="cat-select-btn"        id="gmodel-pro"   onclick="selectGeminiModel('gemini-2.5-pro',this)"   style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">Pro 2.5</div><div style="font-size:10px;color:var(--muted);">고품질</div></button>
+        <div class="ask">
+          <label class="sr" for="f-wish">원하는 스타일</label>
+          <input id="f-wish" maxlength="100" placeholder="원하는 스타일 (선택) 예: 15분 안에, 매콤한 거">
+          <button class="btn-primary" type="button" id="aiBtn">AI 추천 받기</button>
+          <button type="button" id="aiStop" hidden>중지</button>
         </div>
-      </div>
-      <button class="neu-btn neu-btn-accent" style="width:100%;padding:12px;" onclick="saveApiKey()">저장</button>
-    </div>
+        <span class="quota" id="quota"></span>
+        <p class="err" id="aiErr" hidden></p>
+        <div class="results" id="aiResults"></div>
+        <h3 style="margin-top:4px">내 레시피에서 찾기</h3>
+        <div class="results" id="myResults"></div>
+      </section>
 
-    <div class="settings-card" id="settings-gpt" style="display:none;">
-      <div class="settings-title">🟢 ChatGPT 설정</div>
-      <div class="form-group">
-        <label class="form-label">API Key</label>
-        <input type="password" class="neu-input" id="gpt-key-input" placeholder="sk-proj-..." />
-        <div class="save-notice">platform.openai.com → API Keys</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">모델</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="cat-select-btn active" id="gmodel-4o-mini" onclick="selectGptModel('gpt-4o-mini',this)" style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">4o mini</div><div style="font-size:10px;color:var(--muted);">저렴·빠름</div></button>
-          <button class="cat-select-btn"        id="gmodel-4o"      onclick="selectGptModel('gpt-4o',this)"      style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">4o</div><div style="font-size:10px;color:var(--muted);">균형</div></button>
-          <button class="cat-select-btn"        id="gmodel-o4-mini" onclick="selectGptModel('o4-mini',this)"     style="padding:10px 6px;flex:1;"><div style="font-weight:700;font-size:12px;">o4 mini</div><div style="font-size:10px;color:var(--muted);">추론</div></button>
-        </div>
-      </div>
-      <button class="neu-btn neu-btn-accent" style="width:100%;padding:12px;" onclick="saveApiKey()">저장</button>
-    </div>
-
-    <div class="settings-card" style="padding:16px 24px;">
-      <div id="api-status-inner" style="display:flex;align-items:center;gap:10px;">
-        <div style="font-size:22px;">⚪</div>
-        <div><div style="font-size:13px;font-weight:600;color:var(--muted);">API 키 미설정</div><div style="font-size:11px;color:var(--muted);">위에서 키를 입력하고 저장하세요</div></div>
-      </div>
-    </div>
-
-    <div class="settings-card">
-      <div class="settings-title">☁️ Cloudflare Worker</div>
-      <div class="form-group">
-        <label class="form-label">Worker URL</label>
-        <input type="url" class="neu-input" id="worker-url-input" placeholder="https://fridge-worker.[id].workers.dev" />
-        <div class="save-notice">설정하면 API 키가 브라우저에 노출되지 않아요</div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="neu-btn" style="flex:1;padding:11px;font-size:13px;" onclick="testWorker()">🔍 연결 테스트</button>
-        <button class="neu-btn neu-btn-accent" style="flex:1;padding:11px;font-size:13px;" onclick="saveWorkerUrl()">저장</button>
-      </div>
-      <div id="worker-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:var(--r-inner);box-shadow:var(--shadow-inset-sm);font-size:13px;"></div>
-    </div>
-
-    <div class="settings-card">
-      <div class="settings-title">🗑️ 데이터 관리</div>
-      <button class="neu-btn" style="width:100%;padding:12px;color:var(--danger);" onclick="clearAllData()">전체 데이터 초기화</button>
-    </div>
-
-    <div class="settings-card" style="text-align:center;">
-      <div style="font-size:32px;margin-bottom:8px;">🧊</div>
-      <div class="font-display" style="font-weight:700;font-size:16px;margin-bottom:4px;">냉장고를 부탁해</div>
-      <div class="text-muted" style="font-size:12px;">v1.3.0 · Claude & Gemini · Worker 지원</div>
+      <section class="card" aria-labelledby="h-my">
+        <h2 id="h-my">내 레시피 DB <span class="count" id="recipeCount">0</span></h2>
+        <ul class="list" id="recipeList"></ul>
+        <form class="form" id="recipeForm" autocomplete="off">
+          <h3 class="c6">레시피 추가</h3>
+          <div class="field c3"><label for="r-name">요리 이름</label><input id="r-name" required maxlength="80" placeholder="예: 대파 계란볶음밥"></div>
+          <div class="field c3"><label for="r-min">조리 시간(분)</label><input id="r-min" type="number" min="1" max="600" placeholder="15"></div>
+          <div class="field c6"><label for="r-ings">재료 (쉼표로 구분)</label><input id="r-ings" required placeholder="밥, 계란, 대파, 간장"></div>
+          <div class="field c6"><label for="r-steps">만드는 법 (한 줄에 한 단계)</label><textarea id="r-steps" placeholder="대파를 송송 썬다&#10;기름에 파를 볶아 파기름을 낸다"></textarea></div>
+          <div class="row-actions c6"><button class="btn-primary" type="submit">레시피 저장</button></div>
+        </form>
+      </section>
     </div>
   </div>
 
+  <section class="card" aria-labelledby="h-picks">
+    <h2 id="h-picks">라양이 산 재료 <span class="count" id="pickCount">0</span></h2>
+    <p class="hint">직접 사서 쓰고 있는 재료예요. 궁금하면 링크로 구경해 보세요.</p>
+    <div class="picks" id="picks"></div>
+    <p class="disclose">이 사이트의 쿠팡 링크는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+  </section>
+
+  <footer>재료명이 조금 달라도(달걀/계란, 대파/파) 같은 재료로 인식해요.</footer>
 </div>
-
-<!-- FAB -->
-<button class="fab" id="fab-add" onclick="openAddModal()" aria-label="재료 추가">+</button>
-
-<!-- 바텀 네비 -->
-<nav class="bottom-nav">
-  <div class="nav-items">
-    <button class="nav-item active" data-page="fridge" onclick="showPage('fridge')"><span class="nav-icon">🧊</span>냉장고</button>
-    <button class="nav-item" data-page="recipe" onclick="showPage('recipe')"><span class="nav-icon">🍳</span>레시피</button>
-    <button class="nav-item" data-page="saved"  onclick="showPage('saved')"><span class="nav-icon">📚</span>저장됨</button>
-  </div>
-</nav>
-
-<!-- 재료 추가 모달 -->
-<div class="modal-overlay" id="add-modal">
-  <div class="bottom-sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title">재료 추가하기</div>
-    <div class="form-group">
-      <label class="form-label">카테고리</label>
-      <div class="cat-select-row">
-        <button class="cat-select-btn active" data-cat="main"  onclick="selectAddCat('main',this)">🥩 메인</button>
-        <button class="cat-select-btn"        data-cat="sub"   onclick="selectAddCat('sub',this)">🧅 서브</button>
-        <button class="cat-select-btn"        data-cat="sauce" onclick="selectAddCat('sauce',this)">🫙 소스</button>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">이모지</label>
-      <div class="emoji-row" id="emoji-picker"></div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">재료명</label>
-      <input type="text" class="neu-input" id="ingr-name" placeholder="예: 두부, 간장, 파 ..." />
-    </div>
-    <div class="form-group">
-      <label class="form-label">단위 <span style="font-weight:400;color:var(--muted);font-size:11px;">(선택)</span></label>
-      <input type="text" class="neu-input" id="ingr-unit" placeholder="개 / 묶음 / 병 / kg ..." />
-    </div>
-    <div class="form-group">
-      <label class="form-label">입력일</label>
-      <input type="date" class="neu-input" id="ingr-adddate" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">유통기한</label>
-      <div class="date-row">
-        <button class="toggle-btn" id="exp-toggle" onclick="toggleExpiry()">+ 유통기한 입력</button>
-        <input type="date" class="neu-input" id="ingr-expiry" style="display:none;" />
-      </div>
-    </div>
-    <div class="sheet-actions">
-      <button class="neu-btn" onclick="closeAddModal()">취소</button>
-      <button class="neu-btn neu-btn-accent" onclick="addIngredient()">추가</button>
-    </div>
-  </div>
-</div>
-
-<!-- 재료 수정 모달 -->
-<div class="modal-overlay" id="edit-modal">
-  <div class="bottom-sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title">재료 수정</div>
-    <input type="hidden" id="edit-id" />
-    <div class="form-group">
-      <label class="form-label">카테고리</label>
-      <div class="cat-select-row" id="edit-cat-row">
-        <button class="cat-select-btn active" data-cat="main"  onclick="selectEditCat('main',this)">🥩 메인</button>
-        <button class="cat-select-btn"        data-cat="sub"   onclick="selectEditCat('sub',this)">🧅 서브</button>
-        <button class="cat-select-btn"        data-cat="sauce" onclick="selectEditCat('sauce',this)">🫙 소스</button>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">이모지</label>
-      <div class="emoji-row" id="edit-emoji-picker"></div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">재료명</label>
-      <input type="text" class="neu-input" id="edit-name" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">단위 <span style="font-weight:400;color:var(--muted);font-size:11px;">(선택)</span></label>
-      <input type="text" class="neu-input" id="edit-unit" placeholder="개 / 묶음 / 병 / kg ..." />
-    </div>
-    <div class="form-group">
-      <label class="form-label">입력일</label>
-      <input type="date" class="neu-input" id="edit-adddate" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">유통기한</label>
-      <div class="date-row">
-        <button class="toggle-btn" id="edit-exp-toggle" onclick="toggleEditExpiry()">+ 유통기한 입력</button>
-        <input type="date" class="neu-input" id="edit-expiry" style="display:none;" />
-      </div>
-    </div>
-    <div class="sheet-actions">
-      <button class="neu-btn" style="color:var(--danger);" onclick="deleteIngredientFromEdit()">삭제</button>
-      <button class="neu-btn neu-btn-accent" onclick="saveEditIngredient()">저장</button>
-    </div>
-  </div>
-</div>
+<div class="toast" id="toast" role="status" hidden></div>
 
 <script>
-// ═══════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════
-const S = {
-  ingredients: [],
-  savedRecipes: [],
-  currentRecipes: [],
-  currentCat: 'all',
-  addCat: 'main',
-  editCat: 'main',
-  addEmoji: '🥩',
-  editEmoji: '🥩',
-  addExpOn: false,
-  editExpOn: false,
-  provider: 'claude',
-  claudeModel: 'claude-sonnet-4-6',
-  geminiModel: 'gemini-2.0-flash',
-  apiKey: '',
-  geminiKey: '',
-  workerUrl: '',
-  gptKey: '',
-  gptModel: 'gpt-4o-mini',
-  recipeOptions: { expiring: false, all: false, healthy: false },
-  mealType: 'all',
+/* ===== 설정 ===== */
+const SUPABASE_URL = "https://ulrfeuafmbbobxnklnuy.supabase.co";
+const SUPABASE_KEY = "sb_publishable_cSB0pp5RkvngY4VUD8as3Q_P_0X7QWn"; // 공개용 키 (RLS로 보호)
+const KEY_STORE = "fridge_api_key";       // 예전 앱과 같은 이름: 저장해 둔 키를 그대로 씀
+const MODEL_STORE = "fridge_claude_model";
+const DEFAULT_STAPLES = ["소금","설탕","후추","간장","식용유","참기름","다진마늘","고춧가루","물"];
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ls = {
+  get(k){ try { return localStorage.getItem(k) || ""; } catch { return ""; } },
+  set(k,v){ try { localStorage.setItem(k, v); } catch {} },
+  del(k){ try { localStorage.removeItem(k); } catch {} }
 };
 
-// ═══════════════════════════════════════════
-//  PERSIST
-// ═══════════════════════════════════════════
-function persist() {
-  localStorage.setItem('fridge_v2_ingredients',   JSON.stringify(S.ingredients));
-  localStorage.setItem('fridge_v2_saved_recipes', JSON.stringify(S.savedRecipes));
+const state = { user:null, admin:false, ings:[], recipes:[], staples:DEFAULT_STAPLES.slice(), pantryExists:false,
+  picks:[], mode:"fridge", filter:"in", editingId:null, ai:[], aiLoading:false };
+
+/* ===== 재료명 매칭 ===== */
+const ALIAS = [["대파","파","쪽파","실파"],["계란","달걀"],["돼지고기","삼겹살","목살","앞다리살","돼지"],["소고기","쇠고기","차돌박이"],
+  ["닭고기","닭","닭가슴살","닭다리살"],["다진마늘","마늘","깐마늘"],["식용유","기름","카놀라유","포도씨유"],["밥","쌀밥","햇반","공기밥"],
+  ["두부","부침두부","찌개두부"],["우유","흰우유"],["치즈","슬라이스치즈","모짜렐라"],["애호박","호박"],["김치","배추김치","묵은지"],["참치","참치캔"],["햄","스팸","통조림햄"]];
+const norm = s => String(s||"").replace(/\(.*?\)/g,"").replace(/\s+/g,"").toLowerCase();
+const groupOf = n => ALIAS.findIndex(g => g.some(a => norm(a) === n));
+function same(a, b){
+  a = norm(a); b = norm(b);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  const ga = groupOf(a); if (ga >= 0 && ga === groupOf(b)) return true;
+  const [s, l] = a.length <= b.length ? [a, b] : [b, a];
+  return s.length >= 2 && (l.endsWith(s) || l.startsWith(s));
+}
+const inFridge = () => state.ings.filter(i => i.in_fridge);
+const hasItem = n => state.staples.some(s => same(s, n)) || inFridge().some(i => same(i.name, n));
+const fridgeItemFor = n => inFridge().find(i => same(i.name, n));
+
+/* ===== 날짜 ===== */
+function dday(exp){
+  if (!exp) return null;
+  const t = new Date(); t.setHours(0,0,0,0);
+  return Math.round((new Date(exp + "T00:00:00") - t) / 86400000);
+}
+function ddayChip(exp){
+  const d = dday(exp);
+  if (d === null) return "";
+  if (d < 0) return `<span class="chip miss">기한 ${-d}일 지남</span>`;
+  if (d <= 3) return `<span class="chip warn">D-${d === 0 ? "DAY" : d}</span>`;
+  return `<span class="chip plain">D-${d}</span>`;
 }
 
-function hydrate() {
-  try {
-    const i = localStorage.getItem('fridge_v2_ingredients');
-    if (i) S.ingredients = JSON.parse(i);
-  } catch(e) {}
-  try {
-    const r = localStorage.getItem('fridge_v2_saved_recipes');
-    if (r) S.savedRecipes = JSON.parse(r);
-  } catch(e) {}
-
-  // 설정값 (DOM 건드리지 않고 state만 복원)
-  S.apiKey      = localStorage.getItem('fridge_api_key')       || '';
-  S.geminiKey   = localStorage.getItem('fridge_gemini_key')    || '';
-  S.provider    = localStorage.getItem('fridge_provider')      || 'claude';
-  S.claudeModel = localStorage.getItem('fridge_claude_model')  || 'claude-sonnet-4-6';
-  S.geminiModel = localStorage.getItem('fridge_gemini_model')  || 'gemini-2.0-flash';
-  S.workerUrl   = localStorage.getItem('fridge_worker_url')    || '';
-  S.gptKey      = localStorage.getItem('fridge_gpt_key')        || '';
-  S.gptModel    = localStorage.getItem('fridge_gpt_model')      || 'gpt-4o-mini';
+/* ===== 구매 링크 ===== */
+const coupangSearch = q => "https://www.coupang.com/np/search?q=" + encodeURIComponent(q);
+function buyLink(name){
+  const mine = state.ings.find(i => i.link && same(i.name, name)) || state.picks.find(p => same(p.name, name));
+  if (mine) return `<a class="buy pick" href="${esc(mine.link)}" target="_blank" rel="noopener sponsored">${esc(name)} · 라양 PICK</a>`;
+  return `<a class="buy" href="${coupangSearch(name)}" target="_blank" rel="noopener">${esc(name)} 검색</a>`;
 }
 
-// ═══════════════════════════════════════════
-//  HELPERS
-// ═══════════════════════════════════════════
-function today() { return new Date().toISOString().split('T')[0]; }
-function daysUntil(d) {
-  if (!d) return null;
-  return Math.ceil((new Date(d) - new Date(today())) / 86400000);
-}
-function fmt(d) {
-  if (!d) return '';
-  const dt = new Date(d);
-  return `${dt.getMonth()+1}/${dt.getDate()}`;
-}
-
-let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
-}
-
-const EMOJIS = {
-  main:  ['🥩','🐔','🐟','🥚','🍖','🦐','🦑','🥓','🍗','🧀'],
-  sub:   ['🧅','🧄','🥦','🌽','🥕','🍆','🥬','🌿','🍄','🫑'],
-  sauce: ['🫙','🫒','🧂','🍯','🌶️','🍋','🫚','🥫','🧴','🫗'],
-};
-
-// ═══════════════════════════════════════════
-//  NAVIGATION
-// ═══════════════════════════════════════════
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  const nav = document.querySelector(`.nav-item[data-page="${name}"]`);
-  if (nav) nav.classList.add('active');
-  document.getElementById('fab-add').style.display = name === 'fridge' ? 'flex' : 'none';
-  if (name === 'fridge')   renderIngredients();
-  if (name === 'recipe')   renderRecipePage();
-  if (name === 'saved')    renderSaved();
-  if (name === 'settings') syncSettingsUI();
-}
-
-// ═══════════════════════════════════════════
-//  FRIDGE RENDER
-// ═══════════════════════════════════════════
-function renderIngredients() {
-  const cat = S.currentCat;
-  const list = document.getElementById('ingredient-list');
-
-  const all      = S.ingredients;
-  const active   = all.filter(i => !i.consumed);
-  const expiring = active.filter(i => { const d = daysUntil(i.expiry); return d !== null && d <= 3; });
-  const checked  = active.filter(i => i.checked);
-  const consumed = all.filter(i => i.consumed);
-
-  document.getElementById('sum-total').textContent        = active.length;
-  document.getElementById('sum-expiring').textContent     = expiring.length;
-  document.getElementById('sum-recipe-check').textContent = checked.length;
-  document.getElementById('sum-consumed').textContent     = consumed.length;
-
-  const filtered = cat === 'all' ? all : all.filter(i => i.cat === cat);
-
-  if (filtered.length === 0) {
-    const icons = { all:'🧊', main:'🥩', sub:'🧅', sauce:'🫙' };
-    list.innerHTML = `<div class="empty-state">
-      <div class="empty-icon" style="animation:float 3s ease-in-out infinite;">${icons[cat]||'🧊'}</div>
-      <div class="empty-text">${cat==='all' ? '냉장고가 비어있어요' : '이 카테고리에 재료가 없어요'}</div>
-      <div class="empty-sub">+ 버튼으로 재료를 추가해보세요</div>
-    </div>`;
-    return;
-  }
-
-  list.innerHTML = filtered.map(ingr => {
-    const days = daysUntil(ingr.expiry);
-    let expBadge = '', borderClass = '';
-    if (ingr.expiry) {
-      if (days <= 0)      { expBadge = `<span class="exp-badge exp-danger">만료됨</span>`;  borderClass = 'expiring-soon'; }
-      else if (days <= 3) { expBadge = `<span class="exp-badge exp-warn">D-${days}</span>`; borderClass = 'expiring-soon'; }
-      else                { expBadge = `<span class="exp-badge exp-ok">D-${days}</span>`; }
-    }
-    const catBadge = { main:'<span class="badge badge-main">메인</span>', sub:'<span class="badge badge-sub">서브</span>', sauce:'<span class="badge badge-sauce">소스</span>' }[ingr.cat] || '';
-    const consumedClass = ingr.consumed ? 'consumed' : '';
-    const checkedClass  = ingr.checked  ? 'checked-for-recipe' : '';
-    const consumedLabel = ingr.consumed ? '↩ 복구' : '소진';
-
-    return `<div class="ingredient-card ${borderClass} ${checkedClass} ${consumedClass}" id="icard-${ingr.id}">
-      <button class="recipe-check ${ingr.checked ? 'checked' : ''}" onclick="toggleCheck('${ingr.id}')" title="레시피 재료 선택">✓</button>
-      <div class="ingredient-emoji">${ingr.emoji}</div>
-      <div class="ingredient-info" onclick="openEditModal('${ingr.id}')">
-        <div class="ingredient-name">${ingr.name}${ingr.unit ? `<span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:4px;">${ingr.unit}</span>` : ''}</div>
-        <div class="ingredient-meta">
-          ${catBadge}
-          <span class="ingredient-date">입력 ${fmt(ingr.addDate)}</span>
-          ${ingr.expiry ? `<span class="ingredient-date">/ 만료 ${fmt(ingr.expiry)}</span>` : ''}
-          ${expBadge}
-        </div>
+/* ===== 렌더 ===== */
+function renderIngs(){
+  let items = state.ings.slice();
+  if (state.filter === "in") items = items.filter(i => i.in_fridge);
+  if (state.filter === "out") items = items.filter(i => !i.in_fridge);
+  if (state.filter === "soon") items = items.filter(i => i.in_fridge && dday(i.expiry) !== null && dday(i.expiry) <= 3);
+  items.sort((a,b) => (dday(a.expiry) ?? 9999) - (dday(b.expiry) ?? 9999) || a.name.localeCompare(b.name, "ko"));
+  $("#fridgeCount").textContent = inFridge().length;
+  $("#ingList").innerHTML = items.length ? items.map(i => `
+    <li class="ing ${i.in_fridge ? "" : "out"}">
+      <div>
+        <div class="name">${esc(i.name)} ${i.in_fridge ? ddayChip(i.expiry) : ""} ${i.is_pick ? '<span class="chip info">공개 PICK</span>' : ""}</div>
+        <div class="meta">${esc([i.category, i.qty].filter(Boolean).join(" · "))}</div>
       </div>
-      <button class="consumed-btn" onclick="toggleConsumed('${ingr.id}');event.stopPropagation();">${consumedLabel}</button>
-    </div>`;
-  }).join('');
+      <div class="row-actions">
+        ${i.link ? `<a class="buy pick" href="${esc(i.link)}" target="_blank" rel="noopener sponsored">구매 링크</a>` : ""}
+        <button class="btn-sm" data-act="toggle" data-id="${i.id}">${i.in_fridge ? "다 먹었어요" : "다시 샀어요"}</button>
+        <button class="btn-sm" data-act="edit" data-id="${i.id}">수정</button>
+        <button class="btn-sm" data-act="del" data-id="${i.id}" aria-label="${esc(i.name)} 삭제">삭제</button>
+      </div>
+    </li>`).join("")
+    : `<li class="empty">${state.filter === "in" ? "냉장고가 비어 있어요. 아래에서 재료를 넣어 주세요." : state.filter === "soon" ? "3일 안에 기한이 끝나는 재료가 없어요." : "다 먹은 재료가 없어요."}</li>`;
+}
+function renderStaples(){
+  $("#staples").innerHTML = state.staples.map((s, idx) =>
+    `<span class="chip ok">${esc(s)}<button type="button" data-staple="${idx}" aria-label="${esc(s)} 빼기">×</button></span>`).join("");
+}
+function renderPicks(){
+  $("#pickCount").textContent = state.picks.length;
+  $("#picks").innerHTML = state.picks.length ? state.picks.map(p => `
+    <div class="pick"><b>${esc(p.name)}</b><span class="meta">${esc(p.category || "")}</span>
+    <a class="buy pick" href="${esc(p.link)}" target="_blank" rel="noopener sponsored">쿠팡에서 보기</a></div>`).join("")
+    : `<div class="empty" style="grid-column:1/-1">아직 공개한 재료가 없어요.</div>`;
+}
+const asIngs = r => (r.ingredients || []).map(x => typeof x === "string" ? { name:x } : x).filter(x => x && x.name);
+function scoreRecipe(r){
+  const ings = asIngs(r);
+  const miss = ings.filter(x => !hasItem(x.name)).length;
+  const soon = ings.filter(x => { const it = fridgeItemFor(x.name); const d = it && dday(it.expiry); return typeof d === "number" && d <= 3; }).length;
+  return { miss, soon, total: ings.length };
+}
+function recipeCard(r, opts = {}){
+  const ings = asIngs(r);
+  const miss = ings.filter(x => !hasItem(x.name));
+  const s = scoreRecipe(r);
+  const chips = ings.map(x => {
+    const ok = hasItem(x.name);
+    return `<span class="chip ${ok ? "ok" : "miss"}">${ok ? "✓" : "＋"} ${esc(x.name)}${x.amount ? " " + esc(x.amount) : ""}</span>`;
+  }).join("");
+  const buy = state.mode === "order" && miss.length ? `
+    <div class="buybox"><span class="t">부족한 재료 ${miss.length}개 주문하기</span>
+      <div class="chips">${miss.map(x => buyLink(x.name)).join("")}</div></div>` : "";
+  const steps = (r.steps || []).filter(Boolean);
+  return `<article class="recipe">
+    <div class="recipe-head"><h3>${esc(r.name)}</h3>
+      <div class="chips">
+        ${r.minutes ? `<span class="chip info">${esc(r.minutes)}분</span>` : ""}
+        ${miss.length ? `<span class="chip miss">${miss.length}개 부족</span>` : `<span class="chip ok">바로 가능</span>`}
+        ${s.soon ? `<span class="chip warn">임박 재료 ${s.soon}개 소진</span>` : ""}
+      </div></div>
+    ${r.why ? `<p class="why">${esc(r.why)}</p>` : ""}
+    <div class="chips">${chips}</div>
+    ${buy}
+    ${steps.length ? `<details><summary>만드는 법 ${steps.length}단계</summary><ol class="steps">${steps.map(t => `<li>${esc(t)}</li>`).join("")}</ol></details>` : ""}
+    <div class="row-actions"><span class="source">${opts.ai ? "AI 추천" : "내 레시피"}</span>
+      ${opts.ai ? `<button class="btn-sm" data-save="${opts.idx}">내 레시피 DB에 저장</button>` : ""}</div>
+  </article>`;
+}
+function renderMine(){
+  let rs = state.recipes.map(r => ({ r, s: scoreRecipe(r) }));
+  rs = state.mode === "fridge" ? rs.filter(x => x.s.miss === 0) : rs.filter(x => x.s.miss > 0 && x.s.miss <= 4);
+  rs.sort((a,b) => b.s.soon - a.s.soon || a.s.miss - b.s.miss);
+  $("#myResults").innerHTML = rs.length ? rs.map(x => recipeCard(x.r)).join("")
+    : `<div class="empty">${state.mode === "fridge" ? "지금 재료로 바로 되는 저장 레시피가 없어요. AI 추천을 받아 보세요." : "몇 가지만 사면 되는 저장 레시피가 없어요."}</div>`;
+}
+function renderAI(){
+  $("#aiResults").innerHTML = state.aiLoading
+    ? `<div class="status"><span class="dot"></span>냉장고를 보고 레시피를 고르는 중이에요. 보통 10~30초 걸려요.</div>`
+    : state.ai.map((r, idx) => recipeCard(r, { ai:true, idx })).join("");
+}
+function renderRecipeList(){
+  $("#recipeCount").textContent = state.recipes.length;
+  $("#recipeList").innerHTML = state.recipes.length ? state.recipes.slice().sort((a,b) => a.name.localeCompare(b.name,"ko")).map(r => {
+    const s = scoreRecipe(r);
+    return `<li class="ing"><div><div class="name">${esc(r.name)}</div>
+      <div class="meta">${esc(asIngs(r).map(x => x.name).join(", "))}</div></div>
+      <div class="row-actions"><span class="chip ${s.miss ? "miss" : "ok"}">${s.total - s.miss}/${s.total}</span>
+      <button class="btn-sm" data-rdel="${r.id}" aria-label="${esc(r.name)} 삭제">삭제</button></div></li>`;
+  }).join("") : `<li class="empty">저장한 레시피가 없어요.</li>`;
+}
+function renderAll(){ renderIngs(); renderStaples(); renderPicks(); renderMine(); renderAI(); renderRecipeList(); }
+
+let toastT;
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2400); }
+function fail(error, fallback){ console.error(error); toast(fallback || "저장하지 못했어요. 잠시 후 다시 시도해 주세요."); }
+
+/* ===== 데이터 ===== */
+async function loadPicks(){
+  const { data, error } = await sb.from("picks").select("*").order("name");
+  if (!error) state.picks = data || [];
+  renderPicks();
+}
+async function loadMine(){
+  const uid = state.user.id;
+  const [ing, rec, pan, adm] = await Promise.all([
+    sb.from("ingredients").select("*").eq("user_id", uid),
+    sb.from("recipes").select("*").eq("user_id", uid).order("created_at", { ascending:false }),
+    sb.from("pantry").select("staples").eq("user_id", uid).maybeSingle(),
+    sb.rpc("is_admin")
+  ]);
+  state.ings = ing.data || [];
+  state.recipes = rec.data || [];
+  state.pantryExists = !!pan.data;
+  state.staples = pan.data?.staples || DEFAULT_STAPLES.slice();
+  state.admin = adm.data === true;
+  $("#pickRow").hidden = !state.admin;
+  renderAll(); loadQuota(); checkImport();
+}
+async function reloadIngs(){ const { data } = await sb.from("ingredients").select("*").eq("user_id", state.user.id); state.ings = data || []; renderAll(); }
+async function reloadRecipes(){ const { data } = await sb.from("recipes").select("*").eq("user_id", state.user.id).order("created_at", { ascending:false }); state.recipes = data || []; renderMine(); renderRecipeList(); }
+async function loadQuota(){
+  if (userKey()){ $("#quota").textContent = "내 Claude 키로 추천해요 (횟수 제한 없음)"; return; }
+  if (state.admin){ $("#quota").textContent = "관리자: 무료 추천 제한 없음"; return; }
+  const today = new Date().toLocaleDateString("sv-SE", { timeZone:"Asia/Seoul" });
+  const { data } = await sb.from("ai_usage").select("count").eq("user_id", state.user.id).eq("day", today).maybeSingle();
+  const used = data?.count || 0;
+  $("#quota").textContent = `오늘 무료 추천 ${Math.max(0, 5 - used)}회 남음 · 설정에서 내 키를 넣으면 무제한`;
 }
 
-function toggleCheck(id) {
-  const i = S.ingredients.find(x => x.id === id);
-  if (!i) return;
-  i.checked = !i.checked;
-  persist();
-  renderIngredients();
+/* ===== 재료 ===== */
+$("#ingForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const name = $("#f-name").value.trim(); if (!name) return;
+  const link = $("#f-link").value.trim();
+  if (link && !/^https:\/\//.test(link)){ toast("링크는 https:// 로 시작해야 해요"); return; }
+  const row = { name, qty: $("#f-qty").value.trim() || null, expiry: $("#f-exp").value || null, category: $("#f-cat").value,
+    link: link || null, is_pick: state.admin && $("#f-pick").checked && !!link };
+  const btn = $("#ingSubmit"); btn.disabled = true;
+  const q = state.editingId ? sb.from("ingredients").update(row).eq("id", state.editingId) : sb.from("ingredients").insert(row);
+  const { error } = await q;
+  btn.disabled = false;
+  if (error) return fail(error);
+  toast(state.editingId ? "수정했어요" : `${name} 넣었어요`);
+  resetIngForm(); await reloadIngs(); if (row.is_pick || state.admin) loadPicks();
+});
+function resetIngForm(){
+  state.editingId = null; $("#ingForm").reset();
+  $("#ingFormTitle").textContent = "재료 추가"; $("#ingSubmit").textContent = "냉장고에 넣기"; $("#ingCancel").hidden = true;
 }
+$("#ingCancel").addEventListener("click", resetIngForm);
+$("#ingList").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-act]"); if (!b) return;
+  const it = state.ings.find(i => i.id === b.dataset.id); if (!it) return;
+  if (b.dataset.act === "edit"){
+    state.editingId = it.id;
+    $("#f-name").value = it.name; $("#f-qty").value = it.qty || ""; $("#f-exp").value = it.expiry || "";
+    $("#f-cat").value = it.category || "기타"; $("#f-link").value = it.link || ""; $("#f-pick").checked = !!it.is_pick;
+    $("#ingFormTitle").textContent = `${it.name} 수정`; $("#ingSubmit").textContent = "수정 저장"; $("#ingCancel").hidden = false;
+    $("#f-name").focus(); return;
+  }
+  if (b.dataset.act === "toggle"){
+    const { error } = await sb.from("ingredients").update({ in_fridge: !it.in_fridge }).eq("id", it.id);
+    if (error) return fail(error);
+    toast(it.in_fridge ? "다 먹은 재료로 옮겼어요 (링크는 남아 있어요)" : "다시 냉장고에 넣었어요");
+    return reloadIngs();
+  }
+  if (b.dataset.act === "del"){
+    if (b.dataset.confirm !== "1"){ b.dataset.confirm = "1"; b.textContent = "정말 삭제"; setTimeout(() => { b.dataset.confirm = ""; b.textContent = "삭제"; }, 3000); return; }
+    const { error } = await sb.from("ingredients").delete().eq("id", it.id);
+    if (error) return fail(error);
+    toast("삭제했어요"); await reloadIngs(); if (it.is_pick) loadPicks();
+  }
+});
+document.querySelectorAll(".filters button").forEach(b => b.addEventListener("click", () => {
+  state.filter = b.dataset.f;
+  document.querySelectorAll(".filters button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  renderIngs();
+}));
 
-function toggleConsumed(id) {
-  const i = S.ingredients.find(x => x.id === id);
-  if (!i) return;
-  i.consumed = !i.consumed;
-  if (i.consumed) i.checked = false; // 소진되면 레시피 선택 해제
-  persist();
-  renderIngredients();
-  toast(i.consumed ? `✓ ${i.name} 소진 처리됨` : `↩ ${i.name} 복구됨`);
+/* ===== 기본 양념 ===== */
+async function saveStaples(list, msg){
+  const { error } = await sb.from("pantry").upsert({ user_id: state.user.id, staples: list });
+  if (error) return fail(error);
+  state.staples = list; state.pantryExists = true; renderAll(); toast(msg);
 }
-
-// 카테고리 탭
-document.getElementById('fridge-cat-tabs').addEventListener('click', e => {
-  const btn = e.target.closest('.cat-tab');
-  if (!btn) return;
-  document.querySelectorAll('#fridge-cat-tabs .cat-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  S.currentCat = btn.dataset.cat;
-  renderIngredients();
+$("#stapleForm").addEventListener("submit", e => {
+  e.preventDefault(); const v = $("#f-staple").value.trim(); if (!v) return;
+  if (state.staples.some(s => same(s, v))){ toast("이미 있는 양념이에요"); return; }
+  saveStaples([...state.staples, v], `${v} 추가했어요`); $("#f-staple").value = "";
+});
+$("#staples").addEventListener("click", e => {
+  const b = e.target.closest("button[data-staple]"); if (!b) return;
+  saveStaples(state.staples.filter((_, i) => i !== Number(b.dataset.staple)), "뺐어요");
 });
 
-// ═══════════════════════════════════════════
-//  ADD MODAL
-// ═══════════════════════════════════════════
-function buildEmojiPicker(containerId, cat, selected, onSelect) {
-  const el = document.getElementById(containerId);
-  el.innerHTML = (EMOJIS[cat] || EMOJIS.main).map(e =>
-    `<div class="emoji-opt${e===selected?' selected':''}" onclick="${onSelect}('${e}',this)">${e}</div>`
-  ).join('');
+/* ===== 레시피 ===== */
+async function insertRecipe(row, msg){
+  const { error } = await sb.from("recipes").insert(row);
+  if (error){ fail(error); return false; }
+  toast(msg); await reloadRecipes(); return true;
 }
+$("#recipeForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const row = { name: $("#r-name").value.trim(), minutes: Number($("#r-min").value) || null,
+    ingredients: $("#r-ings").value.split(/[,，]/).map(s => s.trim()).filter(Boolean).map(name => ({ name })),
+    steps: $("#r-steps").value.split("\n").map(s => s.trim()).filter(Boolean), source: "mine" };
+  if (!row.name || !row.ingredients.length) return;
+  if (await insertRecipe(row, "레시피를 저장했어요")) $("#recipeForm").reset();
+});
+$("#recipeList").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-rdel]"); if (!b) return;
+  if (b.dataset.confirm !== "1"){ b.dataset.confirm = "1"; b.textContent = "정말 삭제"; setTimeout(() => { b.dataset.confirm = ""; b.textContent = "삭제"; }, 3000); return; }
+  const { error } = await sb.from("recipes").delete().eq("id", b.dataset.rdel);
+  if (error) return fail(error);
+  toast("삭제했어요"); reloadRecipes();
+});
+$("#aiResults").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-save]"); if (!b) return;
+  const r = state.ai[Number(b.dataset.save)]; if (!r) return;
+  b.disabled = true;
+  const ok = await insertRecipe({ name: r.name.slice(0,80), minutes: r.minutes && r.minutes <= 600 ? r.minutes : null,
+    ingredients: r.ingredients, steps: r.steps, why: (r.why || "").slice(0,300), source: "ai" }, "내 레시피 DB에 저장했어요");
+  b.textContent = ok ? "저장됨" : "내 레시피 DB에 저장"; b.disabled = ok;
+});
 
-function openAddModal() {
-  S.addCat = 'main'; S.addEmoji = '🥩'; S.addExpOn = false;
-  document.getElementById('ingr-name').value    = '';
-  document.getElementById('ingr-unit').value    = '';
-  document.getElementById('ingr-adddate').value = today();
-  document.getElementById('ingr-expiry').value  = '';
-  document.getElementById('ingr-expiry').style.display = 'none';
-  document.getElementById('exp-toggle').textContent = '+ 유통기한 입력';
-  document.getElementById('exp-toggle').classList.remove('on');
-  document.querySelectorAll('#add-modal .cat-select-btn').forEach(b => b.classList.toggle('active', b.dataset.cat==='main'));
-  buildEmojiPicker('emoji-picker', 'main', '🥩', 'setAddEmoji');
-  document.getElementById('add-modal').classList.add('open');
-  setTimeout(() => document.getElementById('ingr-name').focus(), 300);
+/* ===== 모드 ===== */
+document.querySelectorAll(".mode").forEach(b => b.addEventListener("click", () => {
+  state.mode = b.dataset.mode;
+  document.querySelectorAll(".mode").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  $("#aiBtn").textContent = "AI 추천 받기";
+  state.ai = []; renderAI(); renderMine();
+}));
+
+/* ===== AI ===== */
+const userKey = () => ls.get(KEY_STORE).trim();
+function buildPrompt(items, staples, mode, wish){
+  const list = items.map(i => {
+    const d = typeof i.dday === "number" ? ` [유통기한 D${i.dday >= 0 ? "-" + i.dday : "+" + (-i.dday)}]` : "";
+    return `- ${i.name}${i.qty ? ` (${i.qty})` : ""}${d}`;
+  }).join("\n");
+  const rule = mode === "fridge"
+    ? "반드시 아래 '냉장고 재료'와 '기본 양념'만 사용하세요. 그 외 재료는 절대 넣지 마세요."
+    : "냉장고 재료를 최대한 활용하되, 추가로 사야 하는 재료는 요리당 1~4개까지 허용합니다. 재료 목록에는 추가 구매 재료도 모두 포함하세요.";
+  return `당신은 한국 가정식 요리 도우미입니다. 레시피 3개를 추천하세요.
+${rule}
+유통기한이 임박한 재료(D-3 이하)를 우선 사용하세요. 기한이 지난 재료는 쓰지 마세요.
+${wish ? "사용자 요청(요리 취향으로만 참고): " + wish + "\n" : ""}
+[냉장고 재료]
+${list}
+
+[기본 양념]
+${staples.join(", ")}
+
+재료명은 한국 마트에서 쓰는 짧은 일반 명사로 쓰세요(예: 대파, 계란, 돼지고기).
+다른 말 없이 JSON 배열만 답하세요. 형식:
+[{"name":"요리 이름","minutes":15,"why":"추천 이유 한 문장","ingredients":[{"name":"계란","amount":"2개"}],"steps":["1단계 설명","2단계 설명"]}]`;
 }
-function closeAddModal() { document.getElementById('add-modal').classList.remove('open'); }
-document.getElementById('add-modal').addEventListener('click', e => { if (e.target === document.getElementById('add-modal')) closeAddModal(); });
-
-function setAddEmoji(e, el) {
-  S.addEmoji = e;
-  document.querySelectorAll('#emoji-picker .emoji-opt').forEach(x => x.classList.remove('selected'));
-  el.classList.add('selected');
+function parseRecipes(text){
+  let t = String(text || "").trim();
+  const fence = t.match(/```(?:json)?\s*([\s\S]*?)```/); if (fence) t = fence[1];
+  const s = t.search(/[\[{]/), e = Math.max(t.lastIndexOf("]"), t.lastIndexOf("}"));
+  if (s < 0 || e < s) throw new Error("parse");
+  let data = JSON.parse(t.slice(s, e + 1));
+  if (!Array.isArray(data)) data = data.recipes || [];
+  return data.filter(r => r && r.name).map(r => ({
+    name: String(r.name), minutes: Number(r.minutes) || null, why: r.why ? String(r.why) : "",
+    ingredients: (Array.isArray(r.ingredients) ? r.ingredients : []).map(x => typeof x === "string" ? { name:x } : { name:String(x.name || ""), amount: x.amount ? String(x.amount) : "" }).filter(x => x.name),
+    steps: (Array.isArray(r.steps) ? r.steps : []).map(String)
+  }));
 }
-function selectAddCat(cat, el) {
-  S.addCat = cat;
-  document.querySelectorAll('#add-modal .cat-select-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  S.addEmoji = EMOJIS[cat]?.[0] || '🥩';
-  buildEmojiPicker('emoji-picker', cat, S.addEmoji, 'setAddEmoji');
-}
-function toggleExpiry() {
-  S.addExpOn = !S.addExpOn;
-  document.getElementById('ingr-expiry').style.display = S.addExpOn ? 'block' : 'none';
-  document.getElementById('exp-toggle').textContent = S.addExpOn ? '유통기한 입력중' : '+ 유통기한 입력';
-  document.getElementById('exp-toggle').classList.toggle('on', S.addExpOn);
-  if (S.addExpOn) document.getElementById('ingr-expiry').focus();
-}
-function addIngredient() {
-  const name = document.getElementById('ingr-name').value.trim();
-  if (!name) { toast('재료명을 입력해주세요'); return; }
-  const ingr = {
-    id: Date.now().toString(),
-    name, cat: S.addCat, emoji: S.addEmoji,
-    unit:    document.getElementById('ingr-unit').value.trim(),
-    addDate: document.getElementById('ingr-adddate').value || today(),
-    expiry:  S.addExpOn ? document.getElementById('ingr-expiry').value : '',
-    checked: false, consumed: false,
-  };
-  S.ingredients.push(ingr);
-  persist();
-  closeAddModal();
-  renderIngredients();
-  toast(`${ingr.emoji} ${name} 추가됨`);
-}
-
-// ═══════════════════════════════════════════
-//  EDIT MODAL
-// ═══════════════════════════════════════════
-function openEditModal(id) {
-  const i = S.ingredients.find(x => x.id === id);
-  if (!i) return;
-  S.editCat   = i.cat;
-  S.editEmoji = i.emoji;
-  S.editExpOn = !!i.expiry;
-  document.getElementById('edit-id').value      = id;
-  document.getElementById('edit-name').value    = i.name;
-  document.getElementById('edit-unit').value    = i.unit || '';
-  document.getElementById('edit-adddate').value = i.addDate;
-  document.getElementById('edit-expiry').value  = i.expiry || '';
-  document.getElementById('edit-expiry').style.display = S.editExpOn ? 'block' : 'none';
-  document.getElementById('edit-exp-toggle').textContent = S.editExpOn ? '유통기한 입력중' : '+ 유통기한 입력';
-  document.getElementById('edit-exp-toggle').classList.toggle('on', S.editExpOn);
-  document.querySelectorAll('#edit-cat-row .cat-select-btn').forEach(b => b.classList.toggle('active', b.dataset.cat===i.cat));
-  buildEmojiPicker('edit-emoji-picker', i.cat, i.emoji, 'setEditEmoji');
-  document.getElementById('edit-modal').classList.add('open');
-}
-function closeEditModal() { document.getElementById('edit-modal').classList.remove('open'); }
-document.getElementById('edit-modal').addEventListener('click', e => { if (e.target === document.getElementById('edit-modal')) closeEditModal(); });
-
-function setEditEmoji(e, el) {
-  S.editEmoji = e;
-  document.querySelectorAll('#edit-emoji-picker .emoji-opt').forEach(x => x.classList.remove('selected'));
-  el.classList.add('selected');
-}
-function selectEditCat(cat, el) {
-  S.editCat = cat;
-  document.querySelectorAll('#edit-cat-row .cat-select-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  S.editEmoji = EMOJIS[cat]?.[0] || '🥩';
-  buildEmojiPicker('edit-emoji-picker', cat, S.editEmoji, 'setEditEmoji');
-}
-function toggleEditExpiry() {
-  S.editExpOn = !S.editExpOn;
-  document.getElementById('edit-expiry').style.display = S.editExpOn ? 'block' : 'none';
-  document.getElementById('edit-exp-toggle').textContent = S.editExpOn ? '유통기한 입력중' : '+ 유통기한 입력';
-  document.getElementById('edit-exp-toggle').classList.toggle('on', S.editExpOn);
-}
-function saveEditIngredient() {
-  const id  = document.getElementById('edit-id').value;
-  const idx = S.ingredients.findIndex(x => x.id === id);
-  if (idx < 0) return;
-  S.ingredients[idx] = {
-    ...S.ingredients[idx],
-    name:    document.getElementById('edit-name').value.trim() || S.ingredients[idx].name,
-    cat:     S.editCat,
-    emoji:   S.editEmoji,
-    unit:    document.getElementById('edit-unit').value.trim(),
-    addDate: document.getElementById('edit-adddate').value,
-    expiry:  S.editExpOn ? document.getElementById('edit-expiry').value : '',
-  };
-  persist(); closeEditModal(); renderIngredients(); toast('재료가 수정되었습니다');
-}
-function deleteIngredientFromEdit() {
-  const id = document.getElementById('edit-id').value;
-  S.ingredients = S.ingredients.filter(x => x.id !== id);
-  persist(); closeEditModal(); renderIngredients(); toast('재료를 삭제했습니다');
-}
-
-// ═══════════════════════════════════════════
-//  RECIPE PAGE
-// ═══════════════════════════════════════════
-function renderRecipePage() {
-  renderSelectedChips();
-  if (S.currentRecipes.length > 0) renderRecipeCards(S.currentRecipes);
-}
-
-function renderSelectedChips() {
-  const checked = S.ingredients.filter(i => i.checked && !i.consumed);
-  const el = document.getElementById('selected-ingredients-display');
-  if (checked.length === 0) {
-    el.innerHTML = `<span class="text-muted" style="font-size:13px;padding:8px 0;">냉장고 탭에서 재료를 선택하거나 아래 옵션을 사용하세요</span>`;
-    return;
-  }
-  el.innerHTML = checked.map(i =>
-    `<span class="sel-chip">${i.emoji} ${i.name}<span class="chip-remove" onclick="uncheckIngr('${i.id}')">×</span></span>`
-  ).join('');
-}
-
-function uncheckIngr(id) {
-  const i = S.ingredients.find(x => x.id === id);
-  if (i) { i.checked = false; persist(); renderSelectedChips(); }
-}
-
-function toggleRecipeOption(opt) {
-  S.recipeOptions[opt] = !S.recipeOptions[opt];
-  if (opt==='all'      && S.recipeOptions.all)      { S.recipeOptions.expiring = false; document.getElementById('opt-expiring').classList.remove('on'); }
-  if (opt==='expiring' && S.recipeOptions.expiring) { S.recipeOptions.all      = false; document.getElementById('opt-all').classList.remove('on'); }
-  document.getElementById('opt-'+opt).classList.toggle('on', S.recipeOptions[opt]);
-}
-
-function setMealType(t) {
-  S.mealType = t;
-  document.querySelectorAll('[id^="mtype-"]').forEach(b => b.classList.remove('active'));
-  document.getElementById('mtype-'+t).classList.add('active');
-}
-
-async function generateRecipes() {
-  const workerUrl = S.workerUrl;
-  const provider  = S.provider;
-  const key       = provider === 'gemini' ? S.geminiKey
-                  : provider === 'gpt'    ? S.gptKey
-                  : S.apiKey;
-
-  if (!workerUrl && !key) {
-    toast('⚙️ 설정에서 API 키를 입력해주세요');
-    showPage('settings');
-    return;
-  }
-
-  const active = S.ingredients.filter(i => !i.consumed);
-  let targets = [];
-  if (S.recipeOptions.all)      { targets = active; }
-  else if (S.recipeOptions.expiring) { targets = active.filter(i => { const d=daysUntil(i.expiry); return d!==null&&d<=5; }); if(!targets.length) targets=active; }
-  else { targets = active.filter(i => i.checked); }
-  if (!targets.length) targets = active;
-  if (!targets.length) { toast('냉장고에 재료를 먼저 추가해주세요'); return; }
-
-  const results = document.getElementById('recipe-results');
-  results.innerHTML = `<div class="ai-loading"><div class="ai-spinner">🤖</div><div class="ai-loading-text">AI가 레시피를 구상 중이에요</div><div class="text-muted" style="font-size:13px;">재료를 분석하고 있어요...</div></div>`;
-
-  const mealMap = { all:'제한없음', korean:'한식', western:'양식', quick:'10분 이내 빠른 요리' };
-  const healthy = S.recipeOptions.healthy ? '가능한 건강식 위주로, ' : '';
-  const ingrList = targets.map(i => {
-    const exp = i.expiry ? ` (유통기한:${i.expiry}${daysUntil(i.expiry)<=3?', 임박!':''})` : '';
-    const catLabel = i.cat==='main'?'메인':i.cat==='sub'?'서브':'소스';
-    return `- ${i.emoji} ${i.name}${i.unit?' ('+i.unit+')':''} [${catLabel}]${exp}`;
-  }).join('\n');
-
-  const prompt = `당신은 창의적인 요리사입니다. 아래 냉장고 재료로 ${healthy}${mealMap[S.mealType]} 레시피를 정확히 3개 추천해주세요.
-
-냉장고 재료:
-${ingrList}
-
-반드시 아래 JSON 형식으로만 답하세요. 마크다운 코드블록 없이 순수 JSON만 출력:
-{"recipes":[{"id":"1","title":"요리명","emoji":"🍳","time":"20분","difficulty":"쉬움","ingredients_used":["재료1"],"steps":["1단계","2단계","3단계"],"tip":"팁","why":"추천이유"}]}`;
-
+let ctl = null;
+const showErr = msg => { const el = $("#aiErr"); el.textContent = msg || ""; el.hidden = !msg; };
+$("#aiBtn").addEventListener("click", async () => {
+  const fridge = inFridge();
+  if (!fridge.length){ showErr("냉장고에 재료를 먼저 넣어 주세요."); return; }
+  showErr("");
+  const items = fridge.map(i => ({ name: i.name, qty: i.qty || "", dday: dday(i.expiry) }));
+  const wish = $("#f-wish").value.trim().slice(0,100);
+  ctl = new AbortController();
+  state.aiLoading = true; renderAI(); $("#aiBtn").disabled = true; $("#aiStop").hidden = false;
   try {
-    let text = '';
-    if (workerUrl) {
-      const model = provider==='gemini' ? S.geminiModel
-                       : provider==='gpt'    ? S.gptModel
-                       : S.claudeModel;
-      const res = await fetch(`${workerUrl}/api/recipe`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({prompt, provider, model}) });
-      if (!res.ok) throw new Error((await res.json()).error || 'Worker 오류');
-      text = (await res.json()).text;
-    } else if (provider === 'gemini') {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${S.geminiModel}:generateContent?key=${key}`;
-      const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.7,maxOutputTokens:2000}}) });
-      if (!res.ok) throw new Error((await res.json()).error?.message || 'Gemini 오류');
-      text = (await res.json()).candidates?.[0]?.content?.parts?.[0]?.text || '';
-    } else if (provider === 'gpt') {
-      // ── ChatGPT (OpenAI) ──
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-        body: JSON.stringify({ model: S.gptModel, max_tokens: 2000, temperature: 0.7, messages: [{ role: 'user', content: prompt }] })
+    let text;
+    const key = userKey();
+    if (key){
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method:"POST", signal: ctl.signal,
+        headers:{ "x-api-key": key, "anthropic-version":"2023-06-01", "content-type":"application/json", "anthropic-dangerous-direct-browser-access":"true" },
+        body: JSON.stringify({ model: ls.get(MODEL_STORE) || "claude-sonnet-5", max_tokens: 2500,
+          messages:[{ role:"user", content: buildPrompt(items, state.staples, state.mode, wish) }] })
       });
-      if (!res.ok) throw new Error((await res.json()).error?.message || 'ChatGPT 오류');
-      text = (await res.json()).choices?.[0]?.message?.content || '';
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok) throw { code: res.status === 401 ? "badkey" : "api", message: out?.error?.message };
+      text = (out.content || []).map(c => c.text || "").join("");
     } else {
-      // ── Claude ──
-      const res = await fetch('https://api.anthropic.com/v1/messages', { method:'POST', headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'}, body: JSON.stringify({model:S.claudeModel, max_tokens:2000, messages:[{role:'user',content:prompt}]}) });
-      if (!res.ok) throw new Error((await res.json()).error?.message || 'Claude 오류');
-      text = (await res.json()).content?.[0]?.text || '';
+      const { data: { session } } = await sb.auth.getSession();
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/recommend`, {
+        method:"POST", signal: ctl.signal,
+        headers:{ "Authorization": `Bearer ${session.access_token}`, "apikey": SUPABASE_KEY, "content-type":"application/json" },
+        body: JSON.stringify({ items, staples: state.staples, mode: state.mode, wish })
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok) throw { code: out.code || "api", message: out.error };
+      text = out.text;
+      if (typeof out.used === "number") $("#quota").textContent = `오늘 무료 추천 ${Math.max(0, out.limit - out.used)}회 남음 · 설정에서 내 키를 넣으면 무제한`;
     }
-    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
-    S.currentRecipes = parsed.recipes || [];
-    renderRecipeCards(S.currentRecipes);
-  } catch(e) {
-    results.innerHTML = `<div class="empty-state"><div class="empty-icon">😕</div><div class="empty-text">레시피 추천 실패</div><div class="empty-sub">${e.message}</div><button class="neu-btn" style="margin-top:16px;" onclick="generateRecipes()">🔄 다시 시도</button></div>`;
+    state.ai = parseRecipes(text);
+    if (!state.ai.length) showErr("추천 결과를 읽지 못했어요. 한 번 더 눌러 주세요.");
+  } catch (e) {
+    if (e?.name === "AbortError") {}
+    else if (e?.code === "quota") showErr(e.message + " 설정에서 내 Claude 키를 넣으면 계속 쓸 수 있어요.");
+    else if (e?.code === "badkey") showErr("Claude 키가 올바르지 않아요. 설정에서 키를 확인해 주세요.");
+    else if (e?.code === "unauthorized") showErr("로그인이 만료됐어요. 다시 로그인해 주세요.");
+    else if (e?.message === "parse") showErr("답을 정리하지 못했어요. 한 번 더 눌러 주세요.");
+    else showErr(e?.message || "추천을 받지 못했어요. 잠시 후 다시 눌러 주세요.");
+  } finally {
+    state.aiLoading = false; $("#aiBtn").disabled = false; $("#aiStop").hidden = true;
+    $("#aiBtn").textContent = state.ai.length ? "다른 레시피 추천" : "AI 추천 받기";
+    renderAI();
   }
-}
+});
+$("#aiStop").addEventListener("click", () => ctl && ctl.abort());
 
-function renderRecipeCards(recipes) {
-  const el = document.getElementById('recipe-results');
-  if (!recipes?.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div><div class="empty-text">레시피가 없어요</div></div>'; return; }
-  el.innerHTML = recipes.map((r,idx) => `
-    <div class="recipe-card">
-      <div class="recipe-header"><div class="recipe-title">${r.title}</div><div class="recipe-title-icon">${r.emoji||'🍳'}</div></div>
-      <div class="recipe-meta-row"><span class="recipe-meta-tag">⏱ ${r.time||'?'}</span><span class="recipe-meta-tag">📊 ${r.difficulty||'보통'}</span></div>
-      ${r.why ? `<div style="font-size:13px;color:var(--accent);margin-bottom:12px;font-weight:500;">💡 ${r.why}</div>` : ''}
-      <div class="recipe-ingredients-used">${(r.ingredients_used||[]).map(x=>`<span class="used-chip">${x}</span>`).join('')}</div>
-      <div class="recipe-steps-preview">
-        ${(r.steps||[]).slice(0,2).map((s,i)=>`<b>${i+1}.</b> ${s}`).join('<br>')}
-        ${(r.steps||[]).length>2 ? `<br><span style="color:var(--accent);cursor:pointer;" onclick="toggleDetail(${idx})">+ ${(r.steps||[]).length-2}단계 더 보기</span>` : ''}
-      </div>
-      <div class="recipe-detail" id="rdetail-${idx}">
-        <ol class="step-list">${(r.steps||[]).map((s,i)=>`<li class="step-item"><span class="step-num">${i+1}</span><span>${s}</span></li>`).join('')}</ol>
-        ${r.tip ? `<div style="margin-top:12px;padding:12px;border-radius:var(--r-inner);box-shadow:var(--shadow-inset-sm);font-size:13px;">🔑 ${r.tip}</div>` : ''}
-      </div>
-      <div class="recipe-actions">
-        <button class="neu-btn" id="rdetail-btn-${idx}" onclick="toggleDetail(${idx})">📋 전체 레시피</button>
-        <button class="neu-btn neu-btn-accent" onclick="saveRecipe(${idx})">💾 저장</button>
-      </div>
-      <div class="review-section">
-        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;">⭐ 만들어봤다면 평가해주세요</div>
-        <div class="star-row" id="stars-${idx}">${[1,2,3,4,5].map(s=>`<button class="star-btn" onclick="rateStar(${idx},${s})">☆</button>`).join('')}</div>
-        <textarea class="review-input" id="review-text-${idx}" placeholder="맛은 어떠셨나요? 나만의 변형도 공유해보세요 🍴"></textarea>
-        <button class="neu-btn" style="margin-top:8px;font-size:13px;padding:9px 18px;" onclick="submitReview(${idx})">평가 저장</button>
-      </div>
-    </div>`).join('');
+/* ===== 설정: BYOK ===== */
+function renderKeyState(){
+  const k = userKey();
+  $("#keyState").textContent = k ? `저장된 키: …${k.slice(-4)}` : "저장된 키 없음 (무료 횟수 사용)";
+  $("#k-model").value = ls.get(MODEL_STORE) || "claude-sonnet-5";
+  if ([...$("#k-model").options].every(o => o.value !== $("#k-model").value)) $("#k-model").value = "claude-sonnet-5";
 }
+$("#settingsBtn").addEventListener("click", () => { const c = $("#settingsCard"); c.hidden = !c.hidden; if (!c.hidden) { renderKeyState(); c.scrollIntoView({ behavior:"smooth" }); } });
+$("#keyForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const k = $("#k-key").value.trim();
+  if (k && !/^sk-ant-/.test(k)){ toast("Claude 키는 sk-ant- 로 시작해요"); return; }
+  if (k) ls.set(KEY_STORE, k);
+  ls.set(MODEL_STORE, $("#k-model").value);
+  $("#k-key").value = ""; renderKeyState(); if (state.user) loadQuota(); toast("저장했어요");
+});
+$("#keyDel").addEventListener("click", () => { ls.del(KEY_STORE); renderKeyState(); if (state.user) loadQuota(); toast("키를 지웠어요"); });
 
-function toggleDetail(idx) {
-  const d = document.getElementById('rdetail-'+idx);
-  const b = document.getElementById('rdetail-btn-'+idx);
-  const open = d.classList.toggle('open');
-  b.textContent = open ? '📋 접기' : '📋 전체 레시피';
+/* ===== 예전 앱(localStorage) 데이터 가져오기 ===== */
+function oldData(){ try { return JSON.parse(ls.get("fridge_v2_ingredients") || "[]").filter(i => i && i.name); } catch { return []; } }
+function checkImport(){
+  const old = oldData();
+  if (!old.length || ls.get("chefc_imported") === "1"){ $("#importBox").hidden = true; return; }
+  $("#importBox").hidden = false;
+  $("#importMsg").textContent = `이 기기에 예전 '냉장고를 부탁해' 앱의 재료 ${old.length}개가 남아 있어요.`;
 }
-function rateStar(idx, rating) {
-  document.querySelectorAll(`#stars-${idx} .star-btn`).forEach((s,i) => s.textContent = i<rating ? '⭐':'☆');
-  document.querySelector(`#stars-${idx} .star-btn`).dataset.rating = rating;
-}
-function submitReview(idx) {
-  const rating = parseInt(document.querySelector(`#stars-${idx} .star-btn`).dataset.rating||'0');
-  const text   = document.getElementById('review-text-'+idx).value.trim();
-  if (!rating && !text) { toast('별점이나 리뷰를 입력해주세요'); return; }
-  if (S.currentRecipes[idx]) S.currentRecipes[idx].review = {rating, text, date:today()};
-  toast('평가가 저장되었습니다 ⭐');
-}
-function saveRecipe(idx) {
-  const r = S.currentRecipes[idx];
-  if (!r) return;
-  const entry = {...r, id:Date.now().toString(), savedAt:today(), review:r.review||null};
-  S.savedRecipes.push(entry);
-  persist();
-  toast(`💾 "${r.title}" 저장됨!`);
-}
+$("#importBtn").addEventListener("click", async () => {
+  const rows = oldData().slice(0, 200).map(i => ({ name: String(i.name).slice(0,60), qty: i.unit ? String(i.unit).slice(0,40) : null,
+    expiry: /^\d{4}-\d{2}-\d{2}$/.test(i.expiry || "") ? i.expiry : null, category: "기타", in_fridge: !i.consumed }));
+  const { error } = await sb.from("ingredients").insert(rows);
+  if (error) return fail(error, "가져오지 못했어요.");
+  ls.set("chefc_imported", "1"); $("#importBox").hidden = true; toast(`재료 ${rows.length}개를 가져왔어요`); reloadIngs();
+});
 
-// ═══════════════════════════════════════════
-//  SAVED
-// ═══════════════════════════════════════════
-function renderSaved() {
-  const el = document.getElementById('saved-list');
-  if (!S.savedRecipes.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon" style="animation:float 3s ease-in-out infinite;">📚</div><div class="empty-text">저장된 레시피가 없어요</div><div class="empty-sub">레시피 탭에서 저장해보세요</div></div>`;
-    return;
-  }
-  el.innerHTML = [...S.savedRecipes].reverse().map(r => `
-    <div class="saved-recipe-card">
-      <div class="saved-header">
-        <div class="saved-title">${r.emoji||'🍳'} ${r.title}</div>
-        <button class="neu-btn" style="padding:6px 12px;font-size:12px;color:var(--danger);" onclick="deleteSaved('${r.id}')">삭제</button>
-      </div>
-      <div class="saved-meta">⏱ ${r.time||'-'} · 📊 ${r.difficulty||'-'} · 저장일 ${fmt(r.savedAt)}</div>
-      ${r.review?.rating ? `<div style="font-size:18px;margin-bottom:4px;">${'⭐'.repeat(r.review.rating)}${'☆'.repeat(5-r.review.rating)}</div>` : ''}
-      ${r.review?.text   ? `<div class="saved-review">"${r.review.text}"</div>` : ''}
-      <div style="font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.7;">${(r.steps||[]).map((s,i)=>`<b>${i+1}.</b> ${s}`).join('<br>')}</div>
-      ${r.tip ? `<div style="padding:8px 12px;border-radius:var(--r-inner);box-shadow:var(--shadow-inset-sm);font-size:12px;color:var(--muted);margin-bottom:10px;">🔑 ${r.tip}</div>` : ''}
-      <div style="display:flex;flex-wrap:wrap;gap:6px;">${(r.ingredients_used||[]).map(x=>`<span class="used-chip">${x}</span>`).join('')}</div>
-    </div>`).join('');
-}
-function deleteSaved(id) {
-  if (!confirm('이 레시피를 삭제할까요?')) return;
-  S.savedRecipes = S.savedRecipes.filter(r => r.id !== id);
-  persist(); renderSaved(); toast('레시피가 삭제되었습니다');
-}
+/* ===== 로그인 ===== */
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const email = $("#l-email").value.trim(); if (!email) return;
+  $("#loginBtn").disabled = true;
+  const { error } = await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.origin + location.pathname } });
+  $("#loginBtn").disabled = false;
+  const m = $("#loginMsg"); m.hidden = false;
+  m.textContent = error ? "메일을 보내지 못했어요. 잠시 후 다시 시도해 주세요." : `${email}로 로그인 링크를 보냈어요. 메일함에서 링크를 눌러 주세요.`;
+});
+$("#logoutBtn").addEventListener("click", () => sb.auth.signOut());
 
-// ═══════════════════════════════════════════
-//  SETTINGS
-// ═══════════════════════════════════════════
-function syncSettingsUI() {
-  // 제공자
-  document.querySelectorAll('[id^="provider-"]').forEach(b => b.classList.remove('active'));
-  const pb = document.getElementById('provider-'+S.provider);
-  if (pb) pb.classList.add('active');
-  document.getElementById('settings-claude').style.display = S.provider==='claude' ? 'block':'none';
-  document.getElementById('settings-gemini').style.display = S.provider==='gemini' ? 'block':'none';
-  document.getElementById('settings-gpt').style.display    = S.provider==='gpt'    ? 'block':'none';
-  // Claude 모델
-  document.querySelectorAll('[id^="cmodel-"]').forEach(b => b.classList.remove('active'));
-  const cm = {'claude-sonnet-4-6':'cmodel-sonnet','claude-haiku-4-5-20251001':'cmodel-haiku','claude-opus-4-6':'cmodel-opus'}[S.claudeModel];
-  if (cm) document.getElementById(cm)?.classList.add('active');
-  // Gemini 모델
-  document.querySelectorAll('[id^="gmodel-"]').forEach(b => b.classList.remove('active'));
-  const gm = {'gemini-2.0-flash':'gmodel-flash','gemini-2.5-pro':'gmodel-pro'}[S.geminiModel];
-  if (gm) document.getElementById(gm)?.classList.add('active');
-  // GPT 모델 버튼 복원
-  document.querySelectorAll('[id^="gmodel-"]').forEach(b => b.classList.remove('active'));
-  const gpm = {'gpt-4o-mini':'gmodel-4o-mini','gpt-4o':'gmodel-4o','o4-mini':'gmodel-o4-mini'}[S.gptModel];
-  if (gpm) document.getElementById(gpm)?.classList.add('active');
-  // 키 입력란
-  if (S.apiKey)    document.getElementById('claude-key-input').value = S.apiKey;
-  if (S.geminiKey) document.getElementById('gemini-key-input').value = S.geminiKey;
-  if (S.gptKey)    document.getElementById('gpt-key-input').value    = S.gptKey;
-  if (S.workerUrl) document.getElementById('worker-url-input').value = S.workerUrl;
-  updateApiStatus();
+function applySession(session){
+  const user = session?.user || null;
+  const changed = (user?.id || null) !== (state.user?.id || null);
+  state.user = user;
+  $("#loginCard").hidden = !!user; $("#app").hidden = !user;
+  $("#logoutBtn").hidden = !user; $("#settingsBtn").hidden = !user;
+  $("#whoEmail").textContent = user ? user.email : "";
+  if (!user){ $("#settingsCard").hidden = true; state.ings = []; state.recipes = []; state.ai = []; return; }
+  if (changed) loadMine();
 }
+sb.auth.onAuthStateChange((_ev, session) => setTimeout(() => applySession(session), 0));
+sb.auth.getSession().then(({ data }) => applySession(data.session));
+loadPicks();
+renderAll();
 
-function selectProvider(p, el) {
-  S.provider = p;
-  document.querySelectorAll('[id^="provider-"]').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('settings-claude').style.display = p==='claude' ? 'block':'none';
-  document.getElementById('settings-gemini').style.display = p==='gemini' ? 'block':'none';
-  document.getElementById('settings-gpt').style.display    = p==='gpt'    ? 'block':'none';
-}
-function selectClaudeModel(m, el) { S.claudeModel=m; document.querySelectorAll('[id^="cmodel-"]').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
-function selectGeminiModel(m, el) { S.geminiModel=m; document.querySelectorAll('[id^="gmodel-"]').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
-
-function selectGptModel(m, el) { S.gptModel=m; document.querySelectorAll('[id^="gmodel-"]').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
-
-function saveApiKey() {
-  if (S.provider==='claude') {
-    const k = document.getElementById('claude-key-input').value.trim();
-    if (!k) { toast('API 키를 입력해주세요'); return; }
-    S.apiKey = k;
-    localStorage.setItem('fridge_api_key',      k);
-    localStorage.setItem('fridge_provider',      'claude');
-    localStorage.setItem('fridge_claude_model',  S.claudeModel);
-  } else if (S.provider === 'gpt') {
-    const k = document.getElementById('gpt-key-input').value.trim();
-    if (!k) { toast('API 키를 입력해주세요'); return; }
-    S.gptKey = k;
-    localStorage.setItem('fridge_gpt_key',   k);
-    localStorage.setItem('fridge_provider',  'gpt');
-    localStorage.setItem('fridge_gpt_model', S.gptModel);
-  } else {
-    const k = document.getElementById('gemini-key-input').value.trim();
-    if (!k) { toast('API 키를 입력해주세요'); return; }
-    S.geminiKey = k;
-    localStorage.setItem('fridge_gemini_key',   k);
-    localStorage.setItem('fridge_provider',     'gemini');
-    localStorage.setItem('fridge_gemini_model', S.geminiModel);
-  }
-  updateApiStatus();
-  toast('✓ 저장되었습니다');
-}
-
-function updateApiStatus() {
-  const el = document.getElementById('api-status-inner');
-  if (!el) return;
-  if (S.workerUrl) {
-    el.innerHTML = `<div style="font-size:22px;">☁️</div><div><div style="font-size:13px;font-weight:700;color:var(--accent-teal);">Worker 모드</div><div style="font-size:11px;color:var(--muted);">API 키가 서버에서 관리됩니다</div></div>`;
-  } else if (S.provider==='claude' && S.apiKey) {
-    el.innerHTML = `<div style="font-size:22px;">🟣</div><div><div style="font-size:13px;font-weight:700;color:var(--accent);">Claude 연결됨</div><div style="font-size:11px;color:var(--muted);">${S.claudeModel} · ...${S.apiKey.slice(-4)}</div></div>`;
-  } else if (S.provider==='gemini' && S.geminiKey) {
-    el.innerHTML = `<div style="font-size:22px;">🔵</div><div><div style="font-size:13px;font-weight:700;color:#1a73e8;">Gemini 연결됨</div><div style="font-size:11px;color:var(--muted);">${S.geminiModel} · ...${S.geminiKey.slice(-4)}</div></div>`;
-  } else if (S.provider==='gpt' && S.gptKey) {
-    el.innerHTML = `<div style="font-size:22px;">🟢</div><div><div style="font-size:13px;font-weight:700;color:#10a37f;">ChatGPT 연결됨</div><div style="font-size:11px;color:var(--muted);">${S.gptModel} · ...${S.gptKey.slice(-4)}</div></div>`;
-  } else {
-    el.innerHTML = `<div style="font-size:22px;">⚪</div><div><div style="font-size:13px;font-weight:600;color:var(--muted);">API 키 미설정</div><div style="font-size:11px;color:var(--muted);">위에서 키를 입력하고 저장하세요</div></div>`;
-  }
-}
-
-function saveWorkerUrl() {
-  const url = document.getElementById('worker-url-input').value.trim().replace(/\/+$/, '');
-  if (!url) { toast('Worker URL을 입력해주세요'); return; }
-  if (!url.startsWith('https://')) { toast('https:// 로 시작해야 합니다'); return; }
-  S.workerUrl = url;
-  localStorage.setItem('fridge_worker_url', url);
-  updateApiStatus();
-  toast('☁️ Worker URL 저장됨');
-}
-
-async function testWorker() {
-  const url = (document.getElementById('worker-url-input').value.trim() || S.workerUrl).replace(/\/+$/, '');
-  if (!url) { toast('Worker URL을 먼저 입력해주세요'); return; }
-  const el = document.getElementById('worker-status');
-  el.style.display = 'block';
-  el.style.color = 'var(--muted)';
-  el.textContent = '⏳ 연결 확인 중...';
-  try {
-    const res  = await fetch(url + '/api/health', { signal: AbortSignal.timeout(8000) });
-    const data = await res.json();
-    if (data.ok) {
-      const sv = data.services || {};
-      el.style.color = 'var(--accent-teal)';
-      el.innerHTML = '✅ 연결 성공!&nbsp;&nbsp;'
-        + (sv.claude ? '🟣 Claude ✓' : '🟣 Claude ✗') + '&nbsp;'
-        + (sv.gemini ? '🔵 Gemini ✓' : '🔵 Gemini ✗') + '&nbsp;'
-        + (sv.openai ? '🟢 GPT ✓'   : '🟢 GPT ✗')    + '&nbsp;'
-        + (sv.notion ? '📝 Notion ✓' : '📝 Notion ✗');
-    } else throw new Error('응답 이상');
-  } catch(e) {
-    el.style.color = 'var(--danger)';
-    el.textContent = '❌ 연결 실패: ' + e.message;
-  }
-}
-
-function sav
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
