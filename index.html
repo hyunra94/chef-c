@@ -124,6 +124,10 @@ details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--sky-in
 .quota{font-size:12px;color:var(--muted)}
 .hero{display:grid;gap:10px}
 .hero p{margin:0;max-width:60ch}
+.btn-kakao{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#FEE500;color:rgba(0,0,0,.85);border-color:#FEE500;padding:11px 16px;font-size:15px}
+.btn-kakao svg{width:18px;height:18px}
+.or{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:13px;font-weight:700;box-shadow:var(--shadow);z-index:10;max-width:calc(100% - 32px);text-align:center}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 footer{font-size:12px;color:var(--muted);text-align:center}
@@ -146,7 +150,13 @@ footer{font-size:12px;color:var(--muted);text-align:center}
   <!-- 로그인 전 -->
   <section class="card hero" id="loginCard" hidden aria-labelledby="h-login">
     <h2 id="h-login">로그인하고 내 냉장고 만들기</h2>
-    <p class="hint">비밀번호가 있으면 바로 로그인하고, 처음이거나 비밀번호가 없으면 비밀번호 칸을 비운 채 로그인 링크를 받아 주세요. 로그인하면 AI 레시피 추천을 하루 5번 무료로 쓸 수 있어요.</p>
+    <p class="hint">로그인하면 AI 레시피 추천을 하루 5번 무료로 쓸 수 있어요.</p>
+    <button type="button" class="btn-kakao" id="kakaoBtn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000" d="M12 3C6.5 3 2 6.5 2 10.8c0 2.8 1.9 5.2 4.7 6.6l-1 3.6c-.1.3.3.6.6.4l4.2-2.8c.5.1 1 .1 1.5.1 5.5 0 10-3.5 10-7.9S17.5 3 12 3z"/></svg>
+      카카오로 시작하기
+    </button>
+    <div class="or">또는 이메일로 로그인</div>
+    <p class="hint">비밀번호가 있으면 바로 로그인하고, 비밀번호가 없으면 비밀번호 칸을 비운 채 로그인 링크를 받아 주세요.</p>
     <form class="form" id="loginForm" autocomplete="on">
       <div class="field c3"><label for="l-email">이메일</label>
         <input id="l-email" type="email" required placeholder="you@example.com" autocomplete="email"></div>
@@ -701,6 +711,11 @@ $("#importBtn").addEventListener("click", async () => {
 });
 
 /* ===== 로그인 ===== */
+$("#kakaoBtn").addEventListener("click", async () => {
+  $("#kakaoBtn").disabled = true;
+  const { error } = await sb.auth.signInWithOAuth({ provider:"kakao", options:{ redirectTo: location.origin + location.pathname } });
+  if (error){ $("#kakaoBtn").disabled = false; loginMsg("카카오 로그인을 시작하지 못했어요. 잠시 후 다시 시도해 주세요."); }
+});
 function loginMsg(t){ const m = $("#loginMsg"); m.hidden = false; m.textContent = t; }
 $("#loginForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -744,12 +759,19 @@ function applySession(session){
   state.user = user;
   $("#loginCard").hidden = !!user; $("#app").hidden = !user;
   $("#logoutBtn").hidden = !user; $("#settingsBtn").hidden = !user;
-  $("#whoEmail").textContent = user ? user.email : "";
+  $("#whoEmail").textContent = user ? (user.email || user.user_metadata?.name || user.user_metadata?.nickname || user.user_metadata?.full_name || "카카오 사용자") : "";
   if (!user){ $("#settingsCard").hidden = true; state.ings = []; state.recipes = []; state.ai = []; return; }
   if (changed) loadMine();
 }
 sb.auth.onAuthStateChange((_ev, session) => setTimeout(() => applySession(session), 0));
 sb.auth.getSession().then(({ data }) => applySession(data.session));
+(() => { // 소셜 로그인 실패/취소 후 돌아온 경우 안내
+  const q = new URLSearchParams(location.search + "&" + location.hash.slice(1));
+  if (!q.get("error")) return;
+  const d = q.get("error_description") || "";
+  loginMsg(/denied|cancel/i.test(q.get("error") + d) ? "카카오 로그인을 취소했어요." : "로그인하지 못했어요. 잠시 후 다시 시도해 주세요. (" + d.slice(0, 80) + ")");
+  history.replaceState(null, "", location.pathname);
+})();
 loadPicks();
 renderAll();
 
