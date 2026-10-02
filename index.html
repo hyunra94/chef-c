@@ -146,11 +146,16 @@ footer{font-size:12px;color:var(--muted);text-align:center}
   <!-- 로그인 전 -->
   <section class="card hero" id="loginCard" hidden aria-labelledby="h-login">
     <h2 id="h-login">로그인하고 내 냉장고 만들기</h2>
-    <p class="hint">이메일로 로그인 링크를 보내드려요. 비밀번호는 필요 없어요. 로그인하면 AI 레시피 추천을 하루 5번 무료로 쓸 수 있어요.</p>
-    <form class="ask" id="loginForm" autocomplete="on">
-      <label class="sr" for="l-email">이메일</label>
-      <input id="l-email" type="email" required placeholder="you@example.com" autocomplete="email">
-      <button class="btn-primary" type="submit" id="loginBtn">로그인 링크 받기</button>
+    <p class="hint">비밀번호가 있으면 바로 로그인하고, 처음이거나 비밀번호가 없으면 비밀번호 칸을 비운 채 로그인 링크를 받아 주세요. 로그인하면 AI 레시피 추천을 하루 5번 무료로 쓸 수 있어요.</p>
+    <form class="form" id="loginForm" autocomplete="on">
+      <div class="field c3"><label for="l-email">이메일</label>
+        <input id="l-email" type="email" required placeholder="you@example.com" autocomplete="email"></div>
+      <div class="field c3"><label for="l-pw">비밀번호</label>
+        <input id="l-pw" type="password" placeholder="비밀번호가 없으면 비워 두세요" autocomplete="current-password"></div>
+      <div class="row-actions c6">
+        <button class="btn-primary" type="submit" id="loginBtn">로그인</button>
+        <button type="button" id="linkBtn">비밀번호 없이 로그인 링크 받기</button>
+      </div>
     </form>
     <p class="hint" id="loginMsg" hidden></p>
   </section>
@@ -174,6 +179,13 @@ footer{font-size:12px;color:var(--muted);text-align:center}
         <button type="button" id="keyDel">키 삭제</button>
         <span class="quota" id="keyState"></span>
       </div>
+    </form>
+    <form class="form" id="pwForm" autocomplete="off">
+      <h3 class="c6">비밀번호 설정·변경</h3>
+      <p class="hint c6">비밀번호를 정해 두면 다음부터 메일 없이 이메일과 비밀번호로 바로 들어올 수 있어요.</p>
+      <div class="field c3"><label for="p-new">새 비밀번호 (8자 이상)</label><input id="p-new" type="password" minlength="8" required autocomplete="new-password"></div>
+      <div class="field c3"><label for="p-new2">한 번 더</label><input id="p-new2" type="password" minlength="8" required autocomplete="new-password"></div>
+      <div class="row-actions c6"><button class="btn-primary" type="submit">비밀번호 저장</button></div>
     </form>
     <div class="field" id="importBox" hidden>
       <h3>예전 앱 데이터 가져오기</h3>
@@ -689,16 +701,40 @@ $("#importBtn").addEventListener("click", async () => {
 });
 
 /* ===== 로그인 ===== */
+function loginMsg(t){ const m = $("#loginMsg"); m.hidden = false; m.textContent = t; }
 $("#loginForm").addEventListener("submit", async e => {
   e.preventDefault();
-  const email = $("#l-email").value.trim(); if (!email) return;
+  const email = $("#l-email").value.trim(), password = $("#l-pw").value;
+  if (!email) return;
+  if (!password) return sendLink(email);
   $("#loginBtn").disabled = true;
-  const { error } = await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.origin + location.pathname } });
+  const { error } = await sb.auth.signInWithPassword({ email, password });
   $("#loginBtn").disabled = false;
+  if (error) loginMsg(/invalid/i.test(error.message || "") ? "이메일이나 비밀번호가 맞지 않아요. 비밀번호를 정한 적이 없다면 로그인 링크를 받아 주세요." : "로그인하지 못했어요. 잠시 후 다시 시도해 주세요.");
+  else $("#l-pw").value = "";
+});
+$("#linkBtn").addEventListener("click", () => {
+  const email = $("#l-email").value.trim();
+  if (!email){ $("#l-email").focus(); loginMsg("이메일을 먼저 입력해 주세요."); return; }
+  sendLink(email);
+});
+async function sendLink(email){
+  $("#linkBtn").disabled = true;
+  const { error } = await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.origin + location.pathname } });
+  $("#linkBtn").disabled = false;
   const m = $("#loginMsg"); m.hidden = false;
   if (!error) m.textContent = `${email}로 로그인 링크를 보냈어요. 메일함(스팸함 포함)에서 링크를 눌러 주세요. 링크는 한 번만 쓸 수 있어요.`;
   else if (error.status === 429 || /rate limit/i.test(error.message || "")) m.textContent = "지금은 로그인 메일 요청이 많아서 보낼 수 없어요. 이미 받은 메일이 있으면 그 링크를 눌러 주시고, 없으면 1시간쯤 뒤에 다시 시도해 주세요.";
   else m.textContent = "메일을 보내지 못했어요. 이메일 주소를 확인하고 다시 시도해 주세요.";
+}
+$("#pwForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const a = $("#p-new").value, b = $("#p-new2").value;
+  if (a.length < 8){ toast("비밀번호는 8자 이상이어야 해요"); return; }
+  if (a !== b){ toast("두 비밀번호가 달라요"); return; }
+  const { error } = await sb.auth.updateUser({ password: a });
+  if (error) return fail(error, /same/i.test(error.message || "") ? "지금 비밀번호와 같아요" : "비밀번호를 바꾸지 못했어요. 다시 로그인한 뒤 시도해 주세요.");
+  $("#pwForm").reset(); toast("비밀번호를 저장했어요");
 });
 $("#logoutBtn").addEventListener("click", () => sb.auth.signOut());
 
