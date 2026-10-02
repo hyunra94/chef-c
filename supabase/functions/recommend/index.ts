@@ -1,4 +1,4 @@
-// 냉파 레시피 - AI 레시피 추천 (무료 사용량용)
+// 냉파 레시피 - AI 레시피 추천 + SNS 레시피 가져오기 (무료 사용량용)
 // 로그인한 사용자만 호출 가능. 하루 무료 횟수를 넘으면 429.
 // 사용자가 자기 Claude 키를 쓰는 경우(BYOK)는 브라우저에서 Anthropic을 직접 호출하므로 이 함수를 거치지 않는다.
 //
@@ -57,6 +57,16 @@ ${staples.join(", ")}
 [{"name":"요리 이름","minutes":15,"why":"추천 이유 한 문장","ingredients":[{"name":"계란","amount":"2개"}],"steps":["1단계 설명","2단계 설명"]}]`;
 }
 
+// SNS 레시피 가져오기: 본문/캡처에서 레시피 하나를 뽑아 정리
+export const IMPORT_PROMPT = `아래는 사용자가 SNS(인스타그램, 유튜브, 블로그 등)에서 본 레시피의 본문 또는 캡처 이미지입니다.
+여기서 레시피 하나를 찾아 정리하세요. 본문에 없는 재료나 단계는 지어내지 마세요. 해시태그, 광고, 인사말은 빼세요.
+재료명은 한국 마트에서 쓰는 짧은 일반 명사로, 양은 amount에 따로 쓰세요(예: {"name":"대파","amount":"1/2대"}).
+조리 시간이 안 나와 있으면 단계를 보고 대략 추정하세요.
+레시피를 찾을 수 없으면 {"error":"레시피를 찾지 못했어요"}만 답하세요.
+다른 말 없이 JSON 객체 하나만 답하세요. 형식:
+{"name":"요리 이름","minutes":15,"ingredients":[{"name":"계란","amount":"2개"}],"steps":["1단계 설명","2단계 설명"]}`;
+const IMG_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors(req) });
   if (req.method !== "POST") return json(req, { error: "POST만 지원해요" }, 405);
@@ -70,6 +80,18 @@ Deno.serve(async (req) => {
   // 2) 입력 검증 (프롬프트는 서버가 만든다: 무료 키가 범용 챗봇으로 쓰이지 않게)
   let body: any;
   try { body = await req.json(); } catch { return json(req, { error: "잘못된 요청이에요" }, 400); }
+  const task = body?.task === "import" ? "import" : "recommend";
+  let content: unknown;
+  if (task === "import") {
+    const text = clip(body?.text, 6000).trim();
+    const images = (Array.isArray(body?.images) ? body.images : []).slice(0, 3)
+      .filter((im: any) => IMG_TYPES.includes(im?.media_type) && typeof im?.data === "string" && im.data.length <= 2_000_000);
+    if (!text && !images.length) return json(req, { error: "본문을 붙여넣거나 캡처 이미지를 올려 주세요" }, 400);
+    content = [
+      ...images.map((im: any) => ({ type: "image", source: { type: "base64", media_type: im.media_type, data: im.data } })),
+      { type: "text", text: IMPORT_PROMPT + (text ? "\n\n[본문]\n" + text : "") },
+    ];
+  }
   const items: Item[] = (Array.isArray(body?.items) ? body.items : []).slice(0, 60).map((i: any) => ({
     name: clip(i?.name, 40), qty: clip(i?.qty, 30),
     dday: Number.isFinite(i?.dday) ? Math.max(-999, Math.min(999, Math.round(i.dday))) : null,
@@ -77,7 +99,10 @@ Deno.serve(async (req) => {
   const staples: string[] = (Array.isArray(body?.staples) ? body.staples : []).slice(0, 40).map((s: unknown) => clip(s, 20)).filter(Boolean);
   const mode = body?.mode === "order" ? "order" : "fridge";
   const wish = clip(body?.wish, 100);
-  if (!items.length) return json(req, { error: "냉장고에 재료를 먼저 넣어 주세요" }, 400);
+  if (task === "recommend") {
+    if (!items.length) return json(req, { error: "냉장고에 재료를 먼저 넣어 주세요" }, 400);
+    content = buildPrompt(items, staples, mode, wish);
+  }
 
   // 3) 하루 무료 횟수 (관리자는 무제한)
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
@@ -86,7 +111,7 @@ Deno.serve(async (req) => {
   if (!adm) {
     const { data, error } = await admin.rpc("consume_ai_quota", { p_user: user.id, p_limit: LIMIT });
     if (error) return json(req, { error: "사용량을 확인하지 못했어요" }, 500);
-    if (data === -1) return json(req, { error: `오늘 무료 추천 ${LIMIT}회를 다 썼어요`, code: "quota", limit: LIMIT }, 429);
+    if (data === -1) return json(req, { error: `오늘 무료 AI ${LIMIT}회를 다 썼어요`, code: "quota", limit: LIMIT }, 429);
     used = data as number;
   }
 
@@ -96,7 +121,7 @@ Deno.serve(async (req) => {
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL, max_tokens: 2500, messages: [{ role: "user", content: buildPrompt(items, staples, mode, wish) }] }),
+    body: JSON.stringify({ model: MODEL, max_tokens: 2500, messages: [{ role: "user", content }] }),
   });
   if (!r.ok) {
     console.error("anthropic", r.status, await r.text());

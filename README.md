@@ -6,7 +6,7 @@ https://hyunra.kr/chef-c/
 ## 구조
 - **화면**: GitHub Pages (`index.html`, PWA)
 - **DB·로그인**: Supabase 프로젝트 `chef-c` (이메일 로그인 링크)
-- **AI 추천**: Claude
+- **AI**: Claude (냉장고 재료로 레시피 추천, SNS 본문·캡처에서 레시피 정리)
   - 기본: Edge Function `recommend`가 서버 키로 호출, 로그인 사용자당 하루 무료 횟수 제한
   - 선택: 사용자가 설정에서 자기 Claude 키를 넣으면 브라우저에서 바로 호출(서버를 거치지 않음), 횟수 제한 없음
 
@@ -15,7 +15,7 @@ https://hyunra.kr/chef-c/
 |---|---|---|
 | ingredients | 냉장고 재료, 쿠팡 링크, 공개 PICK 여부 | 본인만. `is_pick`은 관리자만 켤 수 있음 |
 | picks (view) | 공개 PICK 재료 이름·분류·링크 | 누구나 읽기 |
-| recipes | 내 레시피 | 본인만 |
+| recipes | 내 레시피 (SNS에서 가져온 레시피는 원본 링크 `source_url` 포함) | 본인만 |
 | pantry | 기본 양념 | 본인만 |
 | ai_usage | 하루 무료 추천 사용량 | 본인 읽기, Edge Function만 기록 |
 | admins | 관리자 목록 | 직접 접근 불가 |

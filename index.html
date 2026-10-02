@@ -124,6 +124,11 @@ details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--sky-in
 .quota{font-size:12px;color:var(--muted)}
 .hero{display:grid;gap:10px}
 .hero p{margin:0;max-width:60ch}
+.importer{display:grid;gap:10px;padding:14px;border-radius:16px;background:var(--sky);color:var(--ink)}
+.importer textarea,.importer input{background:var(--surface)}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+a.src{font-size:12px;font-weight:700;color:var(--sky-ink)}
 .btn-kakao{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#FEE500;color:rgba(0,0,0,.85);border-color:#FEE500;padding:11px 16px;font-size:15px}
 .btn-kakao svg{width:18px;height:18px}
 .or{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
@@ -150,7 +155,7 @@ footer{font-size:12px;color:var(--muted);text-align:center}
   <!-- 로그인 전 -->
   <section class="card hero" id="loginCard" hidden aria-labelledby="h-login">
     <h2 id="h-login">로그인하고 내 냉장고 만들기</h2>
-    <p class="hint">로그인하면 AI 레시피 추천을 하루 5번 무료로 쓸 수 있어요.</p>
+    <p class="hint">로그인하면 AI 레시피 추천과 SNS 레시피 정리를 합쳐 하루 5번 무료로 쓸 수 있어요.</p>
     <button type="button" class="btn-kakao" id="kakaoBtn">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000" d="M12 3C6.5 3 2 6.5 2 10.8c0 2.8 1.9 5.2 4.7 6.6l-1 3.6c-.1.3.3.6.6.4l4.2-2.8c.5.1 1 .1 1.5.1 5.5 0 10-3.5 10-7.9S17.5 3 12 3z"/></svg>
       카카오로 시작하기
@@ -271,12 +276,29 @@ footer{font-size:12px;color:var(--muted);text-align:center}
       <section class="card" aria-labelledby="h-my">
         <h2 id="h-my">내 레시피 DB <span class="count" id="recipeCount">0</span></h2>
         <ul class="list" id="recipeList"></ul>
+        <div class="importer" id="importer">
+          <h3>SNS에서 본 레시피 가져오기</h3>
+          <p class="hint" style="color:inherit">인스타그램·유튜브·블로그의 레시피 본문을 복사해 붙여넣거나, 화면 캡처를 올려 주세요. AI가 아래 입력칸을 채워 주면 확인하고 저장하면 돼요.</p>
+          <div class="field"><label for="s-text">레시피 본문 붙여넣기</label>
+            <textarea id="s-text" maxlength="6000" placeholder="예: 대파 1/2대, 계란 3개, 간장 1큰술... 1. 대파를 송송 썰어..."></textarea></div>
+          <div class="field"><label for="s-img">캡처 이미지 (최대 3장)</label>
+            <input id="s-img" type="file" accept="image/jpeg,image/png,image/webp" multiple></div>
+          <div class="thumbs" id="s-thumbs"></div>
+          <div class="field"><label for="s-url">원본 링크 (선택)</label>
+            <input id="s-url" type="url" maxlength="500" placeholder="https://www.instagram.com/p/..."></div>
+          <div class="row-actions">
+            <button type="button" class="btn-primary" id="s-go">AI로 정리하기</button>
+            <span class="quota" id="s-status"></span>
+          </div>
+          <p class="err" id="s-err" hidden></p>
+        </div>
         <form class="form" id="recipeForm" autocomplete="off">
           <h3 class="c6">레시피 추가</h3>
           <div class="field c3"><label for="r-name">요리 이름</label><input id="r-name" required maxlength="80" placeholder="예: 대파 계란볶음밥"></div>
           <div class="field c3"><label for="r-min">조리 시간(분)</label><input id="r-min" type="number" min="1" max="600" placeholder="15"></div>
           <div class="field c6"><label for="r-ings">재료 (쉼표로 구분)</label><input id="r-ings" required placeholder="밥, 계란, 대파, 간장"></div>
           <div class="field c6"><label for="r-steps">만드는 법 (한 줄에 한 단계)</label><textarea id="r-steps" placeholder="대파를 송송 썬다&#10;기름에 파를 볶아 파기름을 낸다"></textarea></div>
+          <div class="field c6"><label for="r-url">원본 링크 (선택)</label><input id="r-url" type="url" maxlength="500" placeholder="https://..."></div>
           <div class="row-actions c6"><button class="btn-primary" type="submit">레시피 저장</button></div>
         </form>
       </section>
@@ -418,7 +440,8 @@ function recipeCard(r, opts = {}){
     <div class="chips">${chips}</div>
     ${buy}
     ${steps.length ? `<details><summary>만드는 법 ${steps.length}단계</summary><ol class="steps">${steps.map(t => `<li>${esc(t)}</li>`).join("")}</ol></details>` : ""}
-    <div class="row-actions"><span class="source">${opts.ai ? "AI 추천" : "내 레시피"}</span>
+    <div class="row-actions"><span class="source">${opts.ai ? "AI 추천" : r.source === "sns" ? "SNS 레시피" : "내 레시피"}</span>
+      ${r.source_url ? `<a class="src" href="${esc(r.source_url)}" target="_blank" rel="noopener">원본 보기</a>` : ""}
       ${opts.ai ? `<button class="btn-sm" data-save="${opts.idx}">내 레시피 DB에 저장</button>` : ""}</div>
   </article>`;
 }
@@ -430,16 +453,20 @@ function renderMine(){
     : `<div class="empty">${state.mode === "fridge" ? "지금 재료로 바로 되는 저장 레시피가 없어요. AI 추천을 받아 보세요." : "몇 가지만 사면 되는 저장 레시피가 없어요."}</div>`;
 }
 function renderAI(){
-  $("#aiResults").innerHTML = state.aiLoading
-    ? `<div class="status"><span class="dot"></span>냉장고를 보고 레시피를 고르는 중이에요. 보통 10~30초 걸려요.</div>`
-    : state.ai.map((r, idx) => recipeCard(r, { ai:true, idx })).join("");
+  if (state.aiLoading){ $("#aiResults").innerHTML = `<div class="status"><span class="dot"></span>냉장고를 보고 레시피를 고르는 중이에요. 보통 10~30초 걸려요.</div>`; return; }
+  // 냉장고 모드: 없는 재료가 하나라도 섞인 AI 추천은 뺀다
+  const shown = state.ai.map((r, idx) => ({ r, idx })).filter(x => state.mode !== "fridge" || scoreRecipe(x.r).miss === 0);
+  const hidden = state.ai.length - shown.length;
+  const note = hidden ? `<p class="hint">냉장고에 없는 재료가 들어간 추천 ${hidden}개는 뺐어요.${shown.length ? "" : " 다시 눌러 보거나 '재료 주문하기'로 바꿔 보세요."}</p>` : "";
+  $("#aiResults").innerHTML = shown.map(x => recipeCard(x.r, { ai:true, idx:x.idx })).join("") + note;
 }
 function renderRecipeList(){
   $("#recipeCount").textContent = state.recipes.length;
   $("#recipeList").innerHTML = state.recipes.length ? state.recipes.slice().sort((a,b) => a.name.localeCompare(b.name,"ko")).map(r => {
     const s = scoreRecipe(r);
     return `<li class="ing"><div><div class="name">${esc(r.name)}</div>
-      <div class="meta">${esc(asIngs(r).map(x => x.name).join(", "))}</div></div>
+      <div class="meta">${esc(asIngs(r).map(x => x.name).join(", "))}</div>
+      ${r.source_url ? `<a class="src" href="${esc(r.source_url)}" target="_blank" rel="noopener">원본 보기</a>` : ""}</div>
       <div class="row-actions"><span class="chip ${s.miss ? "miss" : "ok"}">${s.total - s.miss}/${s.total}</span>
       <button class="btn-sm" data-rdel="${r.id}" aria-label="${esc(r.name)} 삭제">삭제</button></div></li>`;
   }).join("") : `<li class="empty">저장한 레시피가 없어요.</li>`;
@@ -480,7 +507,7 @@ async function loadQuota(){
   const today = new Date().toLocaleDateString("sv-SE", { timeZone:"Asia/Seoul" });
   const { data } = await sb.from("ai_usage").select("count").eq("user_id", state.user.id).eq("day", today).maybeSingle();
   const used = data?.count || 0;
-  $("#quota").textContent = `오늘 무료 추천 ${Math.max(0, 5 - used)}회 남음 · 설정에서 내 키를 넣으면 무제한`;
+  $("#quota").textContent = `오늘 무료 AI ${Math.max(0, 5 - used)}회 남음 · 설정에서 내 키를 넣으면 무제한`;
 }
 
 /* ===== 재료 ===== */
@@ -559,9 +586,12 @@ $("#recipeForm").addEventListener("submit", async e => {
   e.preventDefault();
   const row = { name: $("#r-name").value.trim(), minutes: Number($("#r-min").value) || null,
     ingredients: $("#r-ings").value.split(/[,，]/).map(s => s.trim()).filter(Boolean).map(name => ({ name })),
-    steps: $("#r-steps").value.split("\n").map(s => s.trim()).filter(Boolean), source: "mine" };
+    steps: $("#r-steps").value.split("\n").map(s => s.trim()).filter(Boolean), source: state.fromSns ? "sns" : "mine" };
+  const url = $("#r-url").value.trim();
+  if (url && !/^https?:\/\//.test(url)){ toast("원본 링크는 https:// 로 시작해야 해요"); return; }
+  if (url) row.source_url = url.slice(0, 500);
   if (!row.name || !row.ingredients.length) return;
-  if (await insertRecipe(row, "레시피를 저장했어요")) $("#recipeForm").reset();
+  if (await insertRecipe(row, "레시피를 저장했어요")){ $("#recipeForm").reset(); state.fromSns = false; }
 });
 $("#recipeList").addEventListener("click", async e => {
   const b = e.target.closest("button[data-rdel]"); if (!b) return;
@@ -624,6 +654,39 @@ function parseRecipes(text){
     steps: (Array.isArray(r.steps) ? r.steps : []).map(String)
   }));
 }
+// AI 호출 한 곳: 내 키가 있으면 Anthropic 직접, 없으면 무료 서버 함수
+async function askClaude({ serverBody, content, signal }){
+  const key = userKey();
+  if (key){
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", signal,
+      headers:{ "x-api-key": key, "anthropic-version":"2023-06-01", "content-type":"application/json", "anthropic-dangerous-direct-browser-access":"true" },
+      body: JSON.stringify({ model: ls.get(MODEL_STORE) || "claude-sonnet-5", max_tokens: 2500, messages:[{ role:"user", content }] })
+    });
+    const out = await res.json().catch(() => ({}));
+    if (!res.ok) throw { code: res.status === 401 ? "badkey" : "api", message: out?.error?.message };
+    return (out.content || []).map(c => c.text || "").join("");
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) throw { code:"unauthorized" };
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/recommend`, {
+    method:"POST", signal,
+    headers:{ "Authorization": `Bearer ${session.access_token}`, "apikey": SUPABASE_KEY, "content-type":"application/json" },
+    body: JSON.stringify(serverBody)
+  });
+  const out = await res.json().catch(() => ({}));
+  if (!res.ok) throw { code: out.code || "api", message: out.error };
+  if (typeof out.used === "number") $("#quota").textContent = `오늘 무료 AI ${Math.max(0, out.limit - out.used)}회 남음 · 설정에서 내 키를 넣으면 무제한`;
+  return out.text;
+}
+function aiErrorText(e){
+  if (e?.code === "quota") return e.message + " 설정에서 내 Claude 키를 넣으면 계속 쓸 수 있어요.";
+  if (e?.code === "badkey") return "Claude 키가 올바르지 않아요. 설정에서 키를 확인해 주세요.";
+  if (e?.code === "unauthorized") return "로그인이 만료됐어요. 다시 로그인해 주세요.";
+  if (e?.message === "parse") return "답을 정리하지 못했어요. 한 번 더 눌러 주세요.";
+  return e?.message || "AI 응답을 받지 못했어요. 잠시 후 다시 눌러 주세요.";
+}
+
 let ctl = null;
 const showErr = msg => { const el = $("#aiErr"); el.textContent = msg || ""; el.hidden = !msg; };
 $("#aiBtn").addEventListener("click", async () => {
@@ -635,39 +698,13 @@ $("#aiBtn").addEventListener("click", async () => {
   ctl = new AbortController();
   state.aiLoading = true; renderAI(); $("#aiBtn").disabled = true; $("#aiStop").hidden = false;
   try {
-    let text;
-    const key = userKey();
-    if (key){
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method:"POST", signal: ctl.signal,
-        headers:{ "x-api-key": key, "anthropic-version":"2023-06-01", "content-type":"application/json", "anthropic-dangerous-direct-browser-access":"true" },
-        body: JSON.stringify({ model: ls.get(MODEL_STORE) || "claude-sonnet-5", max_tokens: 2500,
-          messages:[{ role:"user", content: buildPrompt(items, state.staples, state.mode, wish) }] })
-      });
-      const out = await res.json().catch(() => ({}));
-      if (!res.ok) throw { code: res.status === 401 ? "badkey" : "api", message: out?.error?.message };
-      text = (out.content || []).map(c => c.text || "").join("");
-    } else {
-      const { data: { session } } = await sb.auth.getSession();
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/recommend`, {
-        method:"POST", signal: ctl.signal,
-        headers:{ "Authorization": `Bearer ${session.access_token}`, "apikey": SUPABASE_KEY, "content-type":"application/json" },
-        body: JSON.stringify({ items, staples: state.staples, mode: state.mode, wish })
-      });
-      const out = await res.json().catch(() => ({}));
-      if (!res.ok) throw { code: out.code || "api", message: out.error };
-      text = out.text;
-      if (typeof out.used === "number") $("#quota").textContent = `오늘 무료 추천 ${Math.max(0, out.limit - out.used)}회 남음 · 설정에서 내 키를 넣으면 무제한`;
-    }
+    const text = await askClaude({ signal: ctl.signal,
+      serverBody: { task:"recommend", items, staples: state.staples, mode: state.mode, wish },
+      content: buildPrompt(items, state.staples, state.mode, wish) });
     state.ai = parseRecipes(text);
     if (!state.ai.length) showErr("추천 결과를 읽지 못했어요. 한 번 더 눌러 주세요.");
   } catch (e) {
-    if (e?.name === "AbortError") {}
-    else if (e?.code === "quota") showErr(e.message + " 설정에서 내 Claude 키를 넣으면 계속 쓸 수 있어요.");
-    else if (e?.code === "badkey") showErr("Claude 키가 올바르지 않아요. 설정에서 키를 확인해 주세요.");
-    else if (e?.code === "unauthorized") showErr("로그인이 만료됐어요. 다시 로그인해 주세요.");
-    else if (e?.message === "parse") showErr("답을 정리하지 못했어요. 한 번 더 눌러 주세요.");
-    else showErr(e?.message || "추천을 받지 못했어요. 잠시 후 다시 눌러 주세요.");
+    if (e?.name !== "AbortError") showErr(aiErrorText(e));
   } finally {
     state.aiLoading = false; $("#aiBtn").disabled = false; $("#aiStop").hidden = true;
     $("#aiBtn").textContent = state.ai.length ? "다른 레시피 추천" : "AI 추천 받기";
@@ -675,6 +712,69 @@ $("#aiBtn").addEventListener("click", async () => {
   }
 });
 $("#aiStop").addEventListener("click", () => ctl && ctl.abort());
+
+/* ===== SNS 레시피 가져오기 ===== */
+const IMPORT_PROMPT = `아래는 사용자가 SNS(인스타그램, 유튜브, 블로그 등)에서 본 레시피의 본문 또는 캡처 이미지입니다.
+여기서 레시피 하나를 찾아 정리하세요. 본문에 없는 재료나 단계는 지어내지 마세요. 해시태그, 광고, 인사말은 빼세요.
+재료명은 한국 마트에서 쓰는 짧은 일반 명사로, 양은 amount에 따로 쓰세요(예: {"name":"대파","amount":"1/2대"}).
+조리 시간이 안 나와 있으면 단계를 보고 대략 추정하세요.
+레시피를 찾을 수 없으면 {"error":"레시피를 찾지 못했어요"}만 답하세요.
+다른 말 없이 JSON 객체 하나만 답하세요. 형식:
+{"name":"요리 이름","minutes":15,"ingredients":[{"name":"계란","amount":"2개"}],"steps":["1단계 설명","2단계 설명"]}`;
+let snsImages = [];
+// 캡처를 긴 변 1280px JPEG로 줄여서 보낸다 (용량·비용 절약)
+async function shrinkImage(file){
+  const bmp = await createImageBitmap(file);
+  const scale = Math.min(1, 1280 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
+  c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+  const url = c.toDataURL("image/jpeg", 0.85);
+  return { media_type:"image/jpeg", data: url.split(",")[1], preview: url };
+}
+$("#s-img").addEventListener("change", async e => {
+  const files = [...e.target.files].slice(0, 3);
+  if (e.target.files.length > 3) toast("이미지는 3장까지만 쓸 수 있어요");
+  try { snsImages = await Promise.all(files.map(shrinkImage)); }
+  catch { snsImages = []; toast("이미지를 읽지 못했어요. JPG나 PNG로 올려 주세요."); }
+  $("#s-thumbs").innerHTML = snsImages.map((im, i) => `<img src="${im.preview}" alt="캡처 ${i + 1}">`).join("");
+});
+$("#s-go").addEventListener("click", async () => {
+  const text = $("#s-text").value.trim().slice(0, 6000);
+  const err = $("#s-err"); err.hidden = true;
+  if (!text && !snsImages.length){ err.textContent = "본문을 붙여넣거나 캡처 이미지를 올려 주세요."; err.hidden = false; return; }
+  const btn = $("#s-go"); btn.disabled = true;
+  $("#s-status").innerHTML = `<span class="status"><span class="dot"></span>레시피를 정리하는 중이에요. 10~30초쯤 걸려요.</span>`;
+  try {
+    const images = snsImages.map(({ media_type, data }) => ({ media_type, data }));
+    const raw = await askClaude({
+      serverBody: { task:"import", text, images },
+      content: [ ...images.map(im => ({ type:"image", source:{ type:"base64", media_type: im.media_type, data: im.data } })),
+                 { type:"text", text: IMPORT_PROMPT + (text ? "\n\n[본문]\n" + text : "") } ]
+    });
+    let obj;
+    try {
+      let t = String(raw || "").trim(); const f = t.match(/```(?:json)?\s*([\s\S]*?)```/); if (f) t = f[1];
+      obj = JSON.parse(t.slice(t.indexOf("{"), t.lastIndexOf("}") + 1));
+    } catch { throw { message:"parse" }; }
+    if (obj.error || !obj.name) throw { message: obj.error || "레시피를 찾지 못했어요. 재료와 만드는 법이 보이도록 다시 올려 주세요." };
+    const ings = (Array.isArray(obj.ingredients) ? obj.ingredients : []).map(x => typeof x === "string" ? x : [x.name, x.amount].filter(Boolean).join(" ")).filter(Boolean);
+    // 재료칸은 "이름" 단위로 매칭하므로 양은 빼고 이름만 넣고, 양은 만드는 법 첫 줄에 남긴다
+    const names = (Array.isArray(obj.ingredients) ? obj.ingredients : []).map(x => typeof x === "string" ? x : x.name).filter(Boolean);
+    $("#r-name").value = String(obj.name).slice(0, 80);
+    $("#r-min").value = Number(obj.minutes) > 0 && Number(obj.minutes) <= 600 ? Math.round(obj.minutes) : "";
+    $("#r-ings").value = names.join(", ");
+    $("#r-steps").value = ["[재료] " + ings.join(", "), ...(Array.isArray(obj.steps) ? obj.steps.map(String) : [])].join("\n");
+    $("#r-url").value = $("#s-url").value.trim();
+    state.fromSns = true;
+    $("#s-status").textContent = "정리했어요. 아래 내용을 확인하고 '레시피 저장'을 눌러 주세요.";
+    $("#recipeForm").scrollIntoView({ behavior:"smooth", block:"start" });
+    $("#s-text").value = ""; $("#s-img").value = ""; $("#s-url").value = ""; snsImages = []; $("#s-thumbs").innerHTML = "";
+  } catch (e) {
+    $("#s-status").textContent = "";
+    err.textContent = aiErrorText(e); err.hidden = false;
+  } finally { btn.disabled = false; }
+});
 
 /* ===== 설정: BYOK ===== */
 function renderKeyState(){
