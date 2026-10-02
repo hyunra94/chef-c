@@ -696,7 +696,9 @@ $("#loginForm").addEventListener("submit", async e => {
   const { error } = await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.origin + location.pathname } });
   $("#loginBtn").disabled = false;
   const m = $("#loginMsg"); m.hidden = false;
-  m.textContent = error ? "메일을 보내지 못했어요. 잠시 후 다시 시도해 주세요." : `${email}로 로그인 링크를 보냈어요. 메일함에서 링크를 눌러 주세요.`;
+  if (!error) m.textContent = `${email}로 로그인 링크를 보냈어요. 메일함(스팸함 포함)에서 링크를 눌러 주세요. 링크는 한 번만 쓸 수 있어요.`;
+  else if (error.status === 429 || /rate limit/i.test(error.message || "")) m.textContent = "지금은 로그인 메일 요청이 많아서 보낼 수 없어요. 이미 받은 메일이 있으면 그 링크를 눌러 주시고, 없으면 1시간쯤 뒤에 다시 시도해 주세요.";
+  else m.textContent = "메일을 보내지 못했어요. 이메일 주소를 확인하고 다시 시도해 주세요.";
 });
 $("#logoutBtn").addEventListener("click", () => sb.auth.signOut());
 
